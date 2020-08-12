@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<p id="log">Event log: Welcome to ascii</p>
+<div id="fill-level-div"></div>
+<button onclick="init()">Initialize Game!</button>
+
+<label for="fill">What would you like to re-fill?</label>
+
+<select name="fill" id="fill-select">
+
+</select>
+
+<button onclick="refill()">Refill</button>
+
+<label for="serve">What would you like to serve your customer?</label>
+
+<select name="serve" id="serve-select">
+
+</select>
+
+<button onclick="serve()">Serve Beverage</button>
+
+
+</body>
+</html>
+
+<script>
+    function log(msg) {
+        log_p = document.getElementById('log');
+        log_p.innerHTML = log_p.innerHTML+ ', ' + msg
+    }
+
+    function init() {
+        get_all_items()
+        var req = new XMLHttpRequest();
+        req.open("GET", "/ingredients", true);
+        req.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var ingredients = JSON.parse(req.responseText).ingredients
+                set_ingredients(ingredients)
+                set_all_fill_level(ingredients)
+            }
+        }
+
+        req.send(null);
+    }
+
+    function addOption(select, item){
+        var opt = document.createElement('option');
+        opt.value = item;
+        opt.innerHTML = item;
+        select.appendChild(opt);
+
+    }
+
+    function set_ingredients(ingredients) {
+        fillSelect = document.getElementById('fill-select');
+        if (ingredients) {
+            ingredients.forEach(function (item, index) {
+                addOption(fillSelect, item)
+            })
+        }
+    }
+
+    function get_all_items() {
+        var req = new XMLHttpRequest();
+        req.open("GET", "/items", true);
+        req.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var items = JSON.parse(req.responseText).items
+                set_items(items)
+            }
+        }
+
+        req.send(null);
+    }
+
+    function set_items(items) {
+        serveSelect = document.getElementById('serve-select');
+        if (items) {
+            items.forEach(function (item, index) {
+                addOption(serveSelect, item)
+            })
+        }
+    }
+
+
+    function refill() {
+        select = document.getElementById('fill-select');
+        option = select.options[select.selectedIndex].value;
+        var req = new XMLHttpRequest();
+        req.open("GET", "/refill/" + option, true);
+        req.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var result = JSON.parse(req.responseText)
+                update_fill_level(option, result)
+
+            }
+
+
+        }
+        req.send(null);
+    }
+
+    function update_fill_level(ingredient, amount){
+        item_fill = document.getElementById('fill-level-'+ ingredient);
+        item_fill.innerHTML = ingredient + ': ' + amount
+    }
+
+    function serve() {
+        select = document.getElementById('serve-select');
+        option = select.options[select.selectedIndex].value;
+        var req = new XMLHttpRequest();
+        req.open("GET", "/serve/" + option, true);
+        req.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var result = JSON.parse(req.responseText)
+                for (key in result.ingredients){
+                    update_fill_level(key, result.ingredients[key])
+                }
+                log(result.msg)
+
+
+            }
+
+
+        }
+        req.send(null);
+    }
+
+    function set_all_fill_level() {
+        var fillLevel = {}
+        var req = new XMLHttpRequest();
+        var levelDiv = document.getElementById('fill-level-div');
+        req.open("GET", "/level", true);
+        req.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                fillLevel = JSON.parse(req.responseText)
+                if (fillLevel) {
+                    for (item in fillLevel) {
+                        var elem = document.createElement('div');
+                        elem.innerHTML = item + ': ' + fillLevel[item];
+                        elem.id = 'fill-level-' + item
+                        levelDiv.appendChild(elem);
+
+                    }
+                }
+            }
+        }
+        req.send(null);
+
+    }
+</script>
