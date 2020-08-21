@@ -15,3 +15,7 @@ npm start
 cd Defold
 open game.project in defold
 - Project->Fetch Libaries
+
+Controlls:
+P to serve "Premium Cola"
+K to serve "Kolle"
