@@ -1,6 +1,8 @@
 import { Room, Client } from "colyseus";
 import { type, Schema, MapSchema } from '@colyseus/schema';
 
+let hitbox = new Set();
+
 //a single player
 class Player extends Schema {
 	@type("number") x : number = 0;
@@ -21,6 +23,10 @@ class State extends Schema {
 
 export class Ascii extends Room {
 	
+	//fills hitbox set with its values
+	fillHitbox() {
+		hitbox.add([1,1]).add([2,1]);
+	}
 	//Message Handlers
 	onServe (client: Client, data : any) {
 		this.state.currentBeverage = data;
@@ -52,13 +58,15 @@ export class Ascii extends Room {
 				y = y - 1;
 				break;
 		}
-		//TODO: check for collision
+		if (hitbox.has([x,y])) { return; }
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
 		this.state.players[client.sessionId].rotation = rotation;
 	}
 	
-	 onCreate (options: any) {
+	onCreate (options: any) {
+	  //fill hitbox with all its values
+	  this.fillHitbox();
 		this.setState(new State());
 		//link Message Handlers
     this.onMessage("serve", (client, message) => { this.onServe(client,message) });
