@@ -1,9 +1,10 @@
-exports.requestJoinOptions = function (i) {
+import { Room, Client } from "colyseus.js";
+
+export function requestJoinOptions (this: Client, i: number) {
     return { requestNumber: i };
 }
 
-exports.onJoin = function () {
-    console.log(this.sessionId, "joined.");
+export function onJoin(this: Room) {
     console.log(this.sessionId, "joined.");
 
     this.onMessage("*", (type, message) => {
@@ -11,14 +12,14 @@ exports.onJoin = function () {
     });
 }
 
-exports.onLeave = function () {
+export function onLeave(this: Room) {
     console.log(this.sessionId, "left.");
 }
 
-exports.onError = function (err) {
+export function onError(this: Room, err: any) {
     console.log(this.sessionId, "!! ERROR !!", err.message);
 }
 
-exports.onStateChange = function (state) {
+export function onStateChange(this: Room, state: any) {
     console.log(this.sessionId, "new state:", state);
 }

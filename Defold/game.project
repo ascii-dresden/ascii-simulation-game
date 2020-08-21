@@ -15,3 +15,6 @@ input_method = HiddenInputField
 title = Ascii thingy
 dependencies = https://github.com/colyseus/colyseus-defold/archive/master.zip,https://github.com/britzl/defold-websocket/archive/master.zip,https://github.com/britzl/defold-luasocket/archive/0.11.zip,https://github.com/britzl/defold-luasec/archive/master.zip
 
+[input]
+game_binding = /input/game.input_bindingc
+
