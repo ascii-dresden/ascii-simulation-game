@@ -1,0 +1,32 @@
+local game_controller = "default:/main#game_controller"
+
+function init(self)                                 -- [1]
+	msg.post(".", "acquire_input_focus")            -- [2]
+end
+
+function final(self)                                -- [7]
+	msg.post(".", "release_input_focus")            -- [8]
+end
+
+function on_input(self, action_id, action)
+	-- send move msg to server
+	if action.pressed then
+		if action_id == hash("up") then 
+			msg.post(game_controller, "move", {dir = "up"});
+		elseif action_id == hash("down") then
+			msg.post(game_controller, "move", {dir = "down"});
+		elseif action_id == hash("right") then
+			msg.post(game_controller, "move", {dir = "right"});
+		elseif action_id == hash("left") then
+			msg.post(game_controller, "move", {dir = "left"});
+		end
+	end
+end
+
+
+function on_message(self, message_id, message, sender)
+	local position = go.get_position();
+	position.x = message.x;
+	position.y = message.y;
+	go.set_position(position);
+end

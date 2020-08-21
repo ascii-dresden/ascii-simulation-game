@@ -5,8 +5,8 @@ main_collection = /scenes/main.collectionc
 shared_state = 1
 
 [display]
-width = 960
-height = 640
+width = 1000
+height = 800
 
 [android]
 input_method = HiddenInputField
