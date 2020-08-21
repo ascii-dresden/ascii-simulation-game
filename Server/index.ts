@@ -5,7 +5,7 @@ import { Server } from "colyseus";
 import { monitor } from "@colyseus/monitor";
 // import socialRoutes from "@colyseus/social/express"
 
-import { kolleCola } from "./kolleCola";
+import { Ascii } from "./Ascii";
 
 const port = Number(process.env.PORT || 2567);
 const app = express()
@@ -19,7 +19,7 @@ const gameServer = new Server({
 });
 
 // register your room handlers
-gameServer.define('kolleCola', kolleCola);
+gameServer.define('Ascii', Ascii);
 
 /**
  * Register @colyseus/social routes

@@ -13,7 +13,7 @@ function init(self)
 	msg.post(".", "acquire_input_focus")
 	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port,false)
 
-	client:join_or_create("kolleCola", {}, function(err, room_instance)
+	client:join_or_create("Ascii", {}, function(err, room_instance)
 		if err then
 			print("ERROR JOINING ROOM")
 			pprint(err)
