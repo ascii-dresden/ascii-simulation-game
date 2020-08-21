@@ -3,12 +3,15 @@
 - simulates the daily business in a coffee shop
 
 
-- Run it using:
+- run Server using:
 
 ```sh
-pip3 install -r requirements.txt
-export FLASK_APP=app.py
-flask run
+cd Server
+npm install
+npm start
 ``` 
 
-- Then connect to http://127.0.0.1:5000/
+- run client using:
+cd Defold
+open game.project in defold
+- Project->Fetch Libaries

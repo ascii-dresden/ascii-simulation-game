@@ -1,0 +1,17 @@
+[bootstrap]
+main_collection = /scenes/main.collectionc
+
+[script]
+shared_state = 1
+
+[display]
+width = 960
+height = 640
+
+[android]
+input_method = HiddenInputField
+
+[project]
+title = Ascii thingy
+dependencies = https://github.com/colyseus/colyseus-defold/archive/master.zip,https://github.com/britzl/defold-websocket/archive/master.zip,https://github.com/britzl/defold-luasocket/archive/0.11.zip,https://github.com/britzl/defold-luasec/archive/master.zip
+

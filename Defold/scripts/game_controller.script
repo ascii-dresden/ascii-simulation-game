@@ -1,0 +1,33 @@
+local ColyseusClient = require "colyseus.client"
+
+-- SERVER VARS
+local server_adress = "localhost"
+local server_port = "2567"
+
+--VARS
+local client
+local room
+
+
+function init(self)
+	print("HEEEY")
+	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port,true)
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	-- Add message-handling code here
+	-- Learn more: https://defold.com/manuals/message-passing/
+	-- Remove this function if not needed
+end
