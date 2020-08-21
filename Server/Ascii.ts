@@ -2,11 +2,11 @@ import { Room, Client } from "colyseus";
 import { type, Schema, MapSchema } from '@colyseus/schema';
 
 let hitbox = new Set();
-
+	
 //a single player
 class Player extends Schema {
-	@type("number") x : number = 0;
-	@type("number") y : number = 0;
+	@type("number") x : number = 2;	//players start behind the counter
+	@type("number") y : number = 1;
 	@type("string") inventory : string = "Empty";
 	@type("number") rotation : number = 0;
 }
@@ -25,7 +25,7 @@ export class Ascii extends Room {
 	
 	//fills hitbox set with its values
 	fillHitbox() {
-		hitbox.add([1,1]).add([2,1]);
+		hitbox.add(101).add(201);
 	}
 	//Message Handlers
 	onServe (client: Client, data : any) {
@@ -58,10 +58,11 @@ export class Ascii extends Room {
 				y = y - 1;
 				break;
 		}
-		if (hitbox.has([x,y])) { return; }
+		console.log([x,y]);
+		this.state.players[client.sessionId].rotation = rotation;
+		if (hitbox.has(x*100+y)) { return; }
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
-		this.state.players[client.sessionId].rotation = rotation;
 	}
 	
 	onCreate (options: any) {
