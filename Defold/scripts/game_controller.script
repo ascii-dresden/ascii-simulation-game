@@ -10,10 +10,24 @@ local room
 -- 1 grid on server is this many pixel:
 local scaling = 100;
 
+
 function onStateChange(change)
 	newx = room.state.players[id].x*scaling;
 	newy = room.state.players[id].y*scaling;
 	msg.post("default:/player#player", "Game State", {x = newx, y = newy});
+	pprint(room.state.players)
+	for other_id,value in pairs(room.state.players) do
+		print(other_id, value)
+		if other_id ~= id and room.state.players[other_id].x then 
+			print(other_id, room.state.players[other_id])
+			newx = room.state.players[other_id].x*scaling;
+			newy = room.state.players[other_id].y*scaling;
+			
+			factory.create("default:/other_player_factory#factory", vmath.vector3(newx, newy, 1), nil, {id = other_id} )
+		end
+	end
+	
+	
 end
 
 
