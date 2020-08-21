@@ -67,6 +67,7 @@ export class Ascii extends Room {
   }
 
   onJoin (client: Client, options: any) {
+  	client.send("id",client.sessionId);
   	this.state.createPlayer(client.sessionId);
   }
 

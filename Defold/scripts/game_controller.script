@@ -1,5 +1,5 @@
 local ColyseusClient = require "colyseus.client"
-
+local id
 -- SERVER VARS
 local server_adress = "localhost"
 local server_port = "2567"
@@ -7,12 +7,19 @@ local server_port = "2567"
 --VARS
 local client
 local room
+-- 1 grid on server is this many pixel:
+local scaling = 100;
+
+function onStateChange(change)
+	newx = room.state.players[id].x*scaling;
+	newy = room.state.players[id].y*scaling;
+	msg.post("default:/player#player", "Game State", {x = newx, y = newy});
+end
 
 
 function init(self)
-	msg.post(".", "acquire_input_focus")
+	msg.post(".", "acquire_input_focus");
 	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port,false)
-
 	client:join_or_create("Ascii", {}, function(err, room_instance)
 		if err then
 			print("ERROR JOINING ROOM")
@@ -22,11 +29,11 @@ function init(self)
 
 		room = room_instance
 
-		room.state.on_change = function(change)
-			print(room.state.currentBeverage);
-		end
+		room.state.on_change = onStateChange;
 
-		
+		room:on_message("id", function(message)
+			id = message;
+		end);		
 	end);
 
 end
@@ -44,9 +51,9 @@ function update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
-	-- Add message-handling code here
-	-- Learn more: https://defold.com/manuals/message-passing/
-	-- Remove this function if not needed
+	if (message_id == hash("move")) then
+		room:send("move",message.dir);
+	end
 end
 
 function on_input(self, action_id, action)
