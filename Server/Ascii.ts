@@ -1,10 +1,12 @@
 import { Room, Client } from "colyseus";
 import { type, Schema, MapSchema } from '@colyseus/schema';
 
+let hitbox = new Set();
+	
 //a single player
 class Player extends Schema {
-	@type("number") x : number = 0;
-	@type("number") y : number = 0;
+	@type("number") x : number = 2;	//players start behind the counter
+	@type("number") y : number = 1;
 	@type("string") inventory : string = "Empty";
 	@type("number") rotation : number = 0;
 }
@@ -21,6 +23,19 @@ class State extends Schema {
 
 export class Ascii extends Room {
 	
+	//fills hitbox set with its values forma: x*10+y
+	fillHitbox() {
+		//main counter
+		hitbox.add(10).add(11).add(12).add(13).add(14).add(15).add(16).add(17);
+		//top counter
+		hitbox.add(27).add(37).add(47).add(57).add(67).add(77).add(87).add(97);
+		//right side
+		hitbox.add(96).add(95).add(94).add(93).add(92).add(91).add(90);
+		//counter with cofee machine
+		hitbox.add(46).add(45).add(44).add(43).add(42).add(41);
+		//storage + fridge
+		hitbox.add(55).add(54).add(53).add(52);
+	}
 	//Message Handlers
 	onServe (client: Client, data : any) {
 		this.state.currentBeverage = data;
@@ -52,13 +67,18 @@ export class Ascii extends Room {
 				y = y - 1;
 				break;
 		}
-		//TODO: check for collision
+		console.log([x,y]);
+		this.state.players[client.sessionId].rotation = rotation;
+		//collision check
+		if (x < 0 || y < 0) { return; }
+		if (hitbox.has(x*10+y)) { return; }
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
-		this.state.players[client.sessionId].rotation = rotation;
 	}
 	
-	 onCreate (options: any) {
+	onCreate (options: any) {
+	  //fill hitbox with all its values
+	  this.fillHitbox();
 		this.setState(new State());
 		//link Message Handlers
     this.onMessage("serve", (client, message) => { this.onServe(client,message) });
