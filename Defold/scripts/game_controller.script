@@ -75,5 +75,9 @@ end
 function on_message(self, message_id, message, sender)
 	if (message_id == hash("move")) then
 		room:send("move",message.dir);
+	elseif (message_id == hash("pickup")) then
+		room:send("pickup",message.item);
+	elseif (message_id == hash("drop")) then
+		room:send("drop");
 	end
 end

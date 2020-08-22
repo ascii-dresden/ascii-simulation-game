@@ -34,7 +34,18 @@ export class Ascii extends Room {
 		hitbox.add(55).add(54).add(53).add(52);
 	}
 	//Message Handlers
-		
+	onPickup (client : Client, data : any) {
+		if (this.state.players[client.sessionId].inventory != "Empty") { return; }
+		//TODO: check wich ingrediants are needed and if they are present 
+		this.state.players[client.sessionId].inventory = data;
+	}
+	
+	onDrop (client: Client, data : any) {
+		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
+		//TODO: do somehting usefull
+		this.state.players[client.sessionId].inventory = "Empty";
+	}
+	
 	//move messages say the client tried to walk 1 space to given direction
 	//collision check at server, update position AND rotation
 	onMove (client: Client, data : any) {
@@ -60,7 +71,6 @@ export class Ascii extends Room {
 				y = y - 1;
 				break;
 		}
-		console.log([x,y]);
 		this.state.players[client.sessionId].rotation = rotation;
 		//collision check
 		if (x < 0 || y < 0) { return; }
@@ -75,6 +85,8 @@ export class Ascii extends Room {
 		this.setState(new State());
 		//link Message Handlers
     this.onMessage("move", (client, message) => { this.onMove(client,message) });
+  	this.onMessage("pickup", (client, message) => { this.onPickup(client,message) });
+  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
   }
 
   onJoin (client: Client, options: any) {

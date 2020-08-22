@@ -19,6 +19,10 @@ function on_input(self, action_id, action)
 			msg.post(game_controller, "move", {dir = "right"});
 		elseif action_id == hash("left") then
 			msg.post(game_controller, "move", {dir = "left"});
+		elseif action_id == hash("drop") then
+			msg.post(game_controller, "drop");
+		elseif action_id == hash("use") then
+			msg.post(game_controller, "pickup", {item = "Kolle"});
 		end
 	end
 end
