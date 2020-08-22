@@ -23,9 +23,18 @@ class State extends Schema {
 
 export class Ascii extends Room {
 	
-	//fills hitbox set with its values
+	//fills hitbox set with its values forma: x*10+y
 	fillHitbox() {
-		hitbox.add(101).add(201);
+		//main counter
+		hitbox.add(10).add(11).add(12).add(13).add(14).add(15).add(16).add(17);
+		//top counter
+		hitbox.add(27).add(37).add(47).add(57).add(67).add(77).add(87).add(97);
+		//right side
+		hitbox.add(96).add(95).add(94).add(93).add(92).add(91).add(90);
+		//counter with cofee machine
+		hitbox.add(46).add(45).add(44).add(43).add(42).add(41);
+		//storage + fridge
+		hitbox.add(55).add(54).add(53).add(52);
 	}
 	//Message Handlers
 	onServe (client: Client, data : any) {
@@ -60,7 +69,9 @@ export class Ascii extends Room {
 		}
 		console.log([x,y]);
 		this.state.players[client.sessionId].rotation = rotation;
-		if (hitbox.has(x*100+y)) { return; }
+		//collision check
+		if (x < 0 || y < 0) { return; }
+		if (hitbox.has(x*10+y)) { return; }
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
 	}
