@@ -18,6 +18,8 @@ function update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
+	print("factory recieved message")
+	pprint(message)
 	local position = go.get_position();
 	position.x = message.x;
 	position.y = message.y;
