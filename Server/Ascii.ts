@@ -2,7 +2,12 @@ import { Room, Client } from "colyseus";
 import { type, Schema, MapSchema } from '@colyseus/schema';
 
 let hitbox = new Set();
-	
+
+
+class int extends Schema {
+	@type("number") value : number;
+}	
+
 //a single player
 class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
@@ -14,11 +19,19 @@ class Player extends Schema {
 //state of the game in the current room
 class State extends Schema {
 	@type({ map: Player }) players = new MapSchema<Player>();
+	@type({ map: int }) Resources = new MapSchema<int>();
 	//function to create a new player for given id  
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
 }
 
 export class Ascii extends Room {
+	
+	fillResources() {
+		let integ = new int();
+		integ.value = 5;
+		this.state.Resources["Kolle"] = integ;
+		this.state.Resources["Premium"] = integ;
+	}
 	
 	//fills hitbox set with its values forma: x*10+y
 	fillHitbox() {
@@ -33,16 +46,36 @@ export class Ascii extends Room {
 		//storage + fridge
 		hitbox.add(55).add(54).add(53).add(52);
 	}
+	
+	//returns a map of all requirements for the given product
+	requires(Product : string) {
+		let output = new Map<string,number>()
+		output.set(Product,1);
+		return output;
+	}
+	
+	consume(Product : string) {
+		let requirement = this.requires(Product);
+		//check if every resource is available
+		for (let resource of requirement.keys()) {
+			if (this.state.Resources[resource].value < requirement.get(resource)) { return false; } }
+		//consume Resources
+		for (let resource of requirement.keys()) {
+			this.state.Resources[resource].value = this.state.Resources[resource].value - requirement.get(resource); }
+		return true;
+	}
+	
 	//Message Handlers
+	//Pcikup
 	onPickup (client : Client, data : any) {
 		if (this.state.players[client.sessionId].inventory != "Empty") { return; }
-		//TODO: check wich ingrediants are needed and if they are present 
+		if (!this.consume(data)) { return false; }
 		this.state.players[client.sessionId].inventory = data;
 	}
 	
 	onDrop (client: Client, data : any) {
 		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
-		//TODO: do somehting usefull
+		//TODO: do something usefull
 		this.state.players[client.sessionId].inventory = "Empty";
 	}
 	
@@ -79,10 +112,11 @@ export class Ascii extends Room {
 		this.state.players[client.sessionId].y = y;
 	}
 	
-	onCreate (options: any) {
-	  //fill hitbox with all its values
-	  this.fillHitbox();
+  onCreate (options: any) {
+		//fill hitbox with all its values
+		this.fillHitbox();
 		this.setState(new State());
+		this.fillResources();
 		//link Message Handlers
     this.onMessage("move", (client, message) => { this.onMove(client,message) });
   	this.onMessage("pickup", (client, message) => { this.onPickup(client,message) });
