@@ -1,12 +1,7 @@
 import { Room, Client } from "colyseus";
 import { type, Schema, MapSchema } from '@colyseus/schema';
 
-let hitbox = new Set();
-
-
-class int extends Schema {
-	@type("number") value : number;
-}	
+let hitbox = new Set();	
 
 //a single player
 class Player extends Schema {
@@ -19,7 +14,7 @@ class Player extends Schema {
 //state of the game in the current room
 class State extends Schema {
 	@type({ map: Player }) players = new MapSchema<Player>();
-	@type({ map: int }) Resources = new MapSchema<int>();
+	@type({ map: "number" }) Resources = new MapSchema<number>();
 	//function to create a new player for given id  
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
 }
@@ -27,10 +22,8 @@ class State extends Schema {
 export class Ascii extends Room {
 	
 	fillResources() {
-		let integ = new int();
-		integ.value = 5;
-		this.state.Resources["Kolle"] = integ;
-		this.state.Resources["Premium"] = integ;
+		this.state.Resources["Kolle"] = 5;
+		this.state.Resources["Premium"] = 5;
 	}
 	
 	//fills hitbox set with its values forma: x*10+y
@@ -58,10 +51,10 @@ export class Ascii extends Room {
 		let requirement = this.requires(Product);
 		//check if every resource is available
 		for (let resource of requirement.keys()) {
-			if (this.state.Resources[resource].value < requirement.get(resource)) { return false; } }
+			if (this.state.Resources[resource] < requirement.get(resource)) { return false; } }
 		//consume Resources
 		for (let resource of requirement.keys()) {
-			this.state.Resources[resource].value = this.state.Resources[resource].value - requirement.get(resource); }
+			this.state.Resources[resource] = this.state.Resources[resource] - requirement.get(resource); }
 		return true;
 	}
 	
