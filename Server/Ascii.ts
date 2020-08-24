@@ -11,6 +11,14 @@ class Player extends Schema {
 	@type("number") rotation : number = 0;
 }
 
+class Customer extends Schema {
+	@type({ map: "string" }) wants = new MapSchema<string>();
+	@type("number") id : number = 0;
+	@type("boolean") hasPaid : boolean = false;
+
+
+}
+
 //state of the game in the current room
 class State extends Schema {
 	//demo for server connection
@@ -19,6 +27,8 @@ class State extends Schema {
 	@type({ map: Player }) players = new MapSchema<Player>();
 	//function to create a new player for given id  
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
+	@type({ map: Customer }) customers = new MapSchema<Customer>();
+
 }
 
 export class Ascii extends Room {
