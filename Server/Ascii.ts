@@ -3,8 +3,10 @@ import { type, Schema, MapSchema } from '@colyseus/schema';
 const csv = require('csv-parser')
 const fs = require('fs')
 
-var results = [];
-
+var Requirements = new Map();
+var max = new Map([ //coffe machine
+			["Milch",5],["Kaffeebohnen",5],["Espresso Bohnen",5],["Schokopulver",5],["Weiße Schokolade",5],
+			["Kolle",3],["Premium",3],["Zotrine",3]]);
 let hitbox = new Set();	
 
 //a single player
@@ -26,8 +28,9 @@ class State extends Schema {
 export class Ascii extends Room {
 	
 	fillResources() {
-		this.state.Resources["Kolle"] = 5;
-		this.state.Resources["Premium"] = 5;
+		for (let item of max.keys()) {
+		this.state.Resources[item] = max.get(item);
+		}
 	}
 	
 	//fills hitbox set with its values forma: x*10+y
@@ -44,15 +47,8 @@ export class Ascii extends Room {
 		hitbox.add(55).add(54).add(53).add(52);
 	}
 	
-	//returns a map of all requirements for the given product
-	requires(Product : string) {
-		let output = new Map<string,number>()
-		output.set(Product,1);
-		return output;
-	}
-	
 	consume(Product : string) {
-		let requirement = this.requires(Product);
+		let requirement = Requirements.get(Product);
 		//check if every resource is available
 		for (let resource of requirement.keys()) {
 			if (this.state.Resources[resource] < requirement.get(resource)) { return false; } }
@@ -111,20 +107,28 @@ export class Ascii extends Room {
 	
   onCreate (options: any) {
   	//read file
-  	this.setPrivate(true);
   	fs.createReadStream('Resources.csv')
   	.pipe(csv())
-  	.on('data', (data : any) => results.push(data)).on('end', () => {
-    this.setPrivate(false);
-		});
-		//fill hitbox with all its values
-		this.fillHitbox();
-		this.setState(new State());
-		this.fillResources();
-		//link Message Handlers
-    this.onMessage("move", (client, message) => { this.onMove(client,message) });
-  	this.onMessage("pickup", (client, message) => { this.onPickup(client,message) });
-  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
+  	.on('data', (data : any) => {	//data contains a single line of the csv as "object" (behaves like struct)
+  		let name : string = data["Getränk"]
+  		let req = new Map();
+		for (let resource of max.keys()) {
+			if (data[resource] == '') { continue; } //meaning this is not required
+			req.set(resource,parseInt(data[resource]));
+		}
+		Requirements.set(name,req);
+  	}).on('end', () => {	//callback after reading
+  		this.fillResources();
+  		//link Message Handlers
+		this.onMessage("move", (client, message) => { this.onMove(client,message) });
+	  	this.onMessage("pickup", (client, message) => { this.onPickup(client,message) });
+	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
+	});
+	//fill hitbox with all its values
+	this.fillHitbox();
+	this.setState(new State());
+	
+	this.onMessage("*", (client, essage) => { console.log("Server isnt finished yet"); });
   }
 
   onJoin (client: Client, options: any) {
