@@ -1,5 +1,9 @@
 import { Room, Client } from "colyseus";
 import { type, Schema, MapSchema } from '@colyseus/schema';
+const csv = require('csv-parser')
+const fs = require('fs')
+
+var results = [];
 
 let hitbox = new Set();	
 
@@ -106,6 +110,13 @@ export class Ascii extends Room {
 	}
 	
   onCreate (options: any) {
+  	//read file
+  	this.setPrivate(true);
+  	fs.createReadStream('Resources.csv')
+  	.pipe(csv())
+  	.on('data', (data : any) => results.push(data)).on('end', () => {
+    this.setPrivate(false);
+		});
 		//fill hitbox with all its values
 		this.fillHitbox();
 		this.setState(new State());
