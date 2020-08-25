@@ -4,7 +4,7 @@ const csv = require('csv-parser')
 const fs = require('fs')
 
 var Requirements = new Map();
-var max = new Map([ //coffe machine
+var max = new Map([ //needs to have exactly the entries of the csv
 			["Milch",5],["Kaffeebohnen",5],["Espresso Bohnen",5],["Schokopulver",5],["Weiße Schokolade",5],
 			["Kolle",3],["Premium",3],["Zotrine",3]]);
 let hitbox = new Set();	
@@ -47,6 +47,7 @@ export class Ascii extends Room {
 		hitbox.add(55).add(54).add(53).add(52);
 	}
 	
+	//returns false if not enough Resources were available
 	consume(Product : string) {
 		let requirement = Requirements.get(Product);
 		//check if every resource is available
@@ -62,7 +63,7 @@ export class Ascii extends Room {
 	//Pcikup
 	onPickup (client : Client, data : any) {
 		if (this.state.players[client.sessionId].inventory != "Empty") { return; }
-		if (!this.consume(data)) { return false; }
+		if (!this.consume(data)) { return; }
 		this.state.players[client.sessionId].inventory = data;
 	}
 	
@@ -105,6 +106,11 @@ export class Ascii extends Room {
 		this.state.players[client.sessionId].y = y;
 	}
 	
+	onRefill(client: Client, data : any) {
+		if (!max.has(data)) { return; }
+		this.state.Resources[data] = max.get(data);
+	}
+	
   onCreate (options: any) {
   	//read file
   	fs.createReadStream('Resources.csv')
@@ -113,7 +119,7 @@ export class Ascii extends Room {
   		let name : string = data["Getränk"]
   		let req = new Map();
 		for (let resource of max.keys()) {
-			if (data[resource] == '') { continue; } //meaning this is not required
+			if (data[resource] == '') { continue; }
 			req.set(resource,parseInt(data[resource]));
 		}
 		Requirements.set(name,req);
@@ -123,6 +129,7 @@ export class Ascii extends Room {
 		this.onMessage("move", (client, message) => { this.onMove(client,message) });
 	  	this.onMessage("pickup", (client, message) => { this.onPickup(client,message) });
 	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
+	  	this.onMessage("refill", (client, message) => { this.onRefill(client,message) });
 	});
 	//fill hitbox with all its values
 	this.fillHitbox();

@@ -36,8 +36,6 @@ function onStateChange(change)
 			end
 		end
 	end
-	
-	
 end
 
 
@@ -73,6 +71,10 @@ function update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
+	--no messages can be sent before the client is ready
+	if (not id) then
+		return
+	end
 	if (message_id == hash("move")) then
 		room:send("move",message.dir);
 	elseif (message_id == hash("pickup")) then
