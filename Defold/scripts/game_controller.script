@@ -10,28 +10,31 @@ local client
 local room
 -- 1 grid on server is this many pixel:
 local scaling = 100;
+local spriteCenter = 50;
 local other_players = {}
 
 function onStateChange(change)
 	if room.state.players and room.state.players[id] then
-		newx = room.state.players[id].x*scaling;
-		newy = room.state.players[id].y*scaling;
-		msg.post("default:/player#player", "Game State", {x = newx, y = newy});
+		newx = room.state.players[id].x*scaling + spriteCenter;
+		newy = room.state.players[id].y*scaling + spriteCenter;
+		newrot = room.state.players[id].rotation * -90;
+		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot});
 
 		for other_id,value in pairs(room.state.players) do
 			if other_id ~= id and room.state.players[other_id].x and not other_players[other_id] then 
 				print(other_id, room.state.players[other_id])
-				newx = room.state.players[other_id].x*scaling;
-				newy = room.state.players[other_id].y*scaling;
+				newx = room.state.players[other_id].x*scaling + spriteCenter;
+				newy = room.state.players[other_id].y*scaling + spriteCenter;
 				
 				created_id = factory.create("default:/other_player_factory#factory", vmath.vector3(newx, newy, 1),vmath.quat(),{},1)
 				other_players[other_id] = created_id
 				
 			elseif other_players[other_id] and other_id ~= id then
-				newx = room.state.players[other_id].x*scaling;
-				newy = room.state.players[other_id].y*scaling;
+				newx = room.state.players[other_id].x*scaling + spriteCenter;
+				newy = room.state.players[other_id].y*scaling + spriteCenter;
+				newrot = room.state.players[other_id].rotation * -90;
 				-- go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
-				msg.post(other_players[other_id], "Game State", {x = newx, y = newy});
+				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot});
 				
 			end
 		end
@@ -78,7 +81,7 @@ function on_message(self, message_id, message, sender)
 	if (message_id == hash("move")) then
 		room:send("move",message.dir);
 	elseif (message_id == hash("pickup")) then
-		room:send("pickup",message.item);
+		room:send("produce",message.item);
 	elseif (message_id == hash("drop")) then
 		room:send("drop");
 	end

@@ -49,6 +49,7 @@ export class Ascii extends Room {
 	
 	//returns false if not enough Resources were available
 	consume(Product : string) {
+		if (!Requirements.has(Product)) { return false; }
 		let requirement = Requirements.get(Product);
 		//check if every resource is available
 		for (let resource of requirement.keys()) {
@@ -61,7 +62,7 @@ export class Ascii extends Room {
 	
 	//Message Handlers
 	//Pcikup
-	onPickup (client : Client, data : any) {
+	onProduce (client : Client, data : any) {
 		if (this.state.players[client.sessionId].inventory != "Empty") { return; }
 		if (!this.consume(data)) { return; }
 		this.state.players[client.sessionId].inventory = data;
@@ -127,7 +128,7 @@ export class Ascii extends Room {
   		this.fillResources();
   		//link Message Handlers
 		this.onMessage("move", (client, message) => { this.onMove(client,message) });
-	  	this.onMessage("pickup", (client, message) => { this.onPickup(client,message) });
+	  	this.onMessage("produce", (client, message) => { this.onProduce(client,message) });
 	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
 	  	this.onMessage("refill", (client, message) => { this.onRefill(client,message) });
 	});
