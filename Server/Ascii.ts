@@ -130,7 +130,4 @@ export class Ascii extends Room {
 	  }
   }
 
-	setInterval(generateCustomer())
-},1000);
-
 }
