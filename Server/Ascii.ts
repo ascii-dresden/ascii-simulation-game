@@ -16,6 +16,19 @@ class Customer extends Schema {
 	@type("number") id : number = 0;
 	@type("boolean") hasPaid : boolean = false;
 
+	constructor(id: number, wants:MapSchema<string>, hasPaid?:boolean){
+		super();
+		this.id = id;
+		this.wants = wants;
+		if(hasPaid){
+			this.hasPaid = hasPaid
+
+		}
+		else{
+			this.hasPaid = true
+		}
+	}
+
 
 }
 
@@ -28,6 +41,8 @@ class State extends Schema {
 	//function to create a new player for given id  
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
 	@type({ map: Customer }) customers = new MapSchema<Customer>();
+	createCustomer (id: number, wants: MapSchema<string>) { this.customers[ id ] = new Customer(id, wants); }
+
 
 }
 
@@ -107,5 +122,15 @@ export class Ascii extends Room {
 
   onDispose() {
   }
+
+  generateCustomer(){
+	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
+	  if(random > 7){
+		this.state.createCustomer()
+	  }
+  }
+
+	setInterval(generateCustomer())
+},1000);
 
 }
