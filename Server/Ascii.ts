@@ -60,14 +60,23 @@ export class Ascii extends Room {
 		return true;
 	}
 	
-	//Message Handlers
-	//Pcikup
-	onProduce (client : Client, data : any) {
+	//one type of "Use"
+	Produce (client : Client, data : string) {
 		if (this.state.players[client.sessionId].inventory != "Empty") { return; }
 		if (!this.consume(data)) { return; }
 		this.state.players[client.sessionId].inventory = data;
 	}
 	
+	//Message Handlers	
+	onUse(client : Client, data : any) {
+		let player = this.state.players[client.sessionId];
+		if (player.x * 10 + player.y == 84 && player.rotation == 1)
+			{ this.Produce(client,"Kolle"); return; }
+		if (player.x * 10 + player.y == 85 && player.rotation == 1)
+			{ this.Produce(client,"Premium"); return; }
+		if (player.x * 10 + player.y == 86 && player.rotation == 1)
+			{ this.Produce(client,"Premium"); return; }
+	}
 	onDrop (client: Client, data : any) {
 		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
 		//TODO: do something usefull
@@ -108,6 +117,7 @@ export class Ascii extends Room {
 	}
 	
 	onRefill(client: Client, data : any) {
+		if (data == "all") { this.fillResources(); return; }
 		if (!max.has(data)) { return; }
 		this.state.Resources[data] = max.get(data);
 	}
@@ -128,7 +138,7 @@ export class Ascii extends Room {
   		this.fillResources();
   		//link Message Handlers
 		this.onMessage("move", (client, message) => { this.onMove(client,message) });
-	  	this.onMessage("produce", (client, message) => { this.onProduce(client,message) });
+	  	this.onMessage("use", (client, message) => { this.onUse(client,message) });
 	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
 	  	this.onMessage("refill", (client, message) => { this.onRefill(client,message) });
 	});
