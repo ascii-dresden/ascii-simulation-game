@@ -119,6 +119,7 @@ export class Ascii extends Room {
   }
 
   generateCustomer(){
+  	if (this.state.customer.length >= 8) { return; }
 	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
 	  if(random > 7){
 	  	let wants = new MapSchema<number>();
