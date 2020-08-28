@@ -1,10 +1,10 @@
 key_trigger {
-  input: KEY_K
-  action: "Kolle"
+  input: KEY_E
+  action: "use"
 }
 key_trigger {
-  input: KEY_P
-  action: "Premium"
+  input: KEY_D
+  action: "drop"
 }
 key_trigger {
   input: KEY_UP
@@ -21,6 +21,10 @@ key_trigger {
 key_trigger {
   input: KEY_RIGHT
   action: "right"
+}
+key_trigger {
+  input: KEY_R
+  action: "refill"
 }
 mouse_trigger {
   input: MOUSE_BUTTON_1

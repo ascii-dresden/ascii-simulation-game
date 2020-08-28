@@ -10,55 +10,66 @@ local client
 local room
 -- 1 grid on server is this many pixel:
 local scaling = 100;
+local spriteCenter = 50;
 local other_players = {}
 local customers = {}
 
 function drawCustomers(change)
 	if table.maxn(room.state.customers) > table.maxn(customers) then
-		created_id = factory.create("default:/customer_factory#factory", vmath.vector3(0,0,1), vmath.quat(),{},1)
+		created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,1), vmath.quat(),{},1)
 		customers[table.maxn(customers) +1] = created_id
 	elseif table.maxn(room.state.customers) < table.maxn(customers) then
 		table.remove(customers)
 	end
 	for pos,customer_id in pairs(customers) do
 		--lua starts indexing at 1 instead of 0 like everything else
-		newy = (pos-1) * scaling;
+		newy = (pos-1) * scaling + spriteCenter;
 		msg.post(customer_id, "Game State", {y = newy})
 	end
 end
 
-function onStateChange(change)
+-- maybe seperate server-client communication and object controller
+-- positions of interactable objects 
+local fullKolle   = {x = 8, y = 4, rotation = 1}
+local fullPremium = {x = 8, y = 5, rotation = 1}
+local fullZotrine = {x = 8, y = 6, rotation = 1}
+
+--handles position and rotation of each player for state changing
+function Move(change)
 	if room.state.players and room.state.players[id] then
-		newx = room.state.players[id].x*scaling;
-		newy = room.state.players[id].y*scaling;
-		msg.post("default:/player#player", "Game State", {x = newx, y = newy});
+		newx = room.state.players[id].x*scaling + spriteCenter;
+		newy = room.state.players[id].y*scaling + spriteCenter;
+		newrot = room.state.players[id].rotation * -90;
+		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot});
 
 		for other_id,value in pairs(room.state.players) do
 			if other_id ~= id and room.state.players[other_id].x and not other_players[other_id] then 
 				print(other_id, room.state.players[other_id])
-				newx = room.state.players[other_id].x*scaling;
-				newy = room.state.players[other_id].y*scaling;
-				
+				newx = room.state.players[other_id].x*scaling + spriteCenter;
+				newy = room.state.players[other_id].y*scaling + spriteCenter;
+
 				created_id = factory.create("default:/other_player_factory#factory", vmath.vector3(newx, newy, 1),vmath.quat(),{},1)
 				other_players[other_id] = created_id
-				
+
 			elseif other_players[other_id] and other_id ~= id then
-				newx = room.state.players[other_id].x*scaling;
-				newy = room.state.players[other_id].y*scaling;
+				newx = room.state.players[other_id].x*scaling + spriteCenter;
+				newy = room.state.players[other_id].y*scaling + spriteCenter;
+				newrot = room.state.players[other_id].rotation * -90;
 				-- go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
-				msg.post(other_players[other_id], "Game State", {x = newx, y = newy});
-				
+				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot});
+
 			end
 		end
 		drawCustomers(change)
 	end
-	
-	
+end
+
+function onStateChange(change)
+	Move(change)
 end
 
 
 function init(self)
-	msg.post(".", "acquire_input_focus");
 	if debug then
 		client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port,false)
 	else
@@ -83,31 +94,22 @@ function init(self)
 
 end
 
-function final(self)
-	-- Add finalization code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
-end
-
 function update(self, dt)
-	-- client is inresponsive without loop
-	-- no info on colyseus doc though
 	client:loop()
 end
 
 function on_message(self, message_id, message, sender)
+	--no messages can be sent before the client is ready
+	if (not id) then
+		return
+	end
 	if (message_id == hash("move")) then
 		room:send("move",message.dir);
+	elseif (message_id == hash("use")) then
+		room:send("use")
+	elseif (message_id == hash("drop")) then
+		room:send("drop");
+	elseif (message_id == hash("refill")) then
+		room:send("refill",message.item);
 	end
-end
-
-function on_input(self, action_id, action)
-	if action_id == hash("Kolle") and action.pressed then
-		print("Kolle!");
-		room:send("serve","Kolle");
-	elseif action_id == hash("Premium") and action.pressed then
-		print("Premium Cola");
-		room:send("serve","Premium Cola");
-	end
-	return true;
 end

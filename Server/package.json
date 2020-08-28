@@ -26,6 +26,7 @@
     "@colyseus/social": "^0.10.9",
     "colyseus": "^0.13.0",
     "cors": "^2.8.5",
+    "csv-parser": "^2.3.3",
     "express": "^4.16.4",
     "express-jwt": "^5.3.1"
   }

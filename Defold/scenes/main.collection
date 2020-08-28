@@ -96,8 +96,8 @@ embedded_instances {
   "blend_mode: BLEND_MODE_ALPHA\\n"
   "\"\n"
   "  position {\n"
-  "    x: 50.0\n"
-  "    y: 50.0\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
   "    z: 0.0\n"
   "  }\n"
   "  rotation {\n"
@@ -109,8 +109,8 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 200.0
-    y: 100.0
+    x: 250.0
+    y: 150.0
     z: 1.0
   }
   rotation {
@@ -168,7 +168,7 @@ embedded_instances {
   data: "embedded_components {\n"
   "  id: \"factory\"\n"
   "  type: \"factory\"\n"
-  "  data: \"prototype: \\\"/other_player.go\\\"\\n"
+  "  data: \"prototype: \\\"/customer.go\\\"\\n"
   "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
