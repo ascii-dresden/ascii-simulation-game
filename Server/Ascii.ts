@@ -1,5 +1,5 @@
 import { Room, Client } from "colyseus";
-import { type, Schema, MapSchema } from '@colyseus/schema';
+import { type, Schema, MapSchema, ArraySchema } from '@colyseus/schema';
 
 let hitbox = new Set();
 	
@@ -12,24 +12,19 @@ class Player extends Schema {
 }
 
 class Customer extends Schema {
-	@type({ map: "string" }) wants = new MapSchema<string>();
-	@type("number") id : number = 0;
+	@type({ map: "number" }) wants = new MapSchema<number>();
 	@type("boolean") hasPaid : boolean = false;
 
-	constructor(id: number, wants:MapSchema<string>, hasPaid?:boolean){
+	constructor(wants:MapSchema<number>, hasPaid?:boolean){
 		super();
-		this.id = id;
 		this.wants = wants;
 		if(hasPaid){
 			this.hasPaid = hasPaid
-
 		}
 		else{
 			this.hasPaid = true
 		}
 	}
-
-
 }
 
 //state of the game in the current room
@@ -40,8 +35,8 @@ class State extends Schema {
 	@type({ map: Player }) players = new MapSchema<Player>();
 	//function to create a new player for given id  
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
-	@type({ map: Customer }) customers = new MapSchema<Customer>();
-	createCustomer (id: number, wants: MapSchema<string>) { this.customers[ id ] = new Customer(id, wants); }
+	@type([Customer]) customers = new ArraySchema<Customer>();
+	createCustomer (wants: MapSchema<number>) { this.customers.push(new Customer(wants)); }
 
 
 }
@@ -99,6 +94,7 @@ export class Ascii extends Room {
 		if (hitbox.has(x*10+y)) { return; }
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
+		this.generateCustomer();
 	}
 	
 	onCreate (options: any) {
@@ -126,7 +122,9 @@ export class Ascii extends Room {
   generateCustomer(){
 	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
 	  if(random > 7){
-		this.state.createCustomer()
+	  	let wants = new MapSchema<number>();
+	  	wants["Kolle"] = 1;
+			this.state.createCustomer(wants)
 	  }
   }
 
