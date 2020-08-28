@@ -87,7 +87,6 @@ export class Ascii extends Room {
 				y = y - 1;
 				break;
 		}
-		console.log([x,y]);
 		this.state.players[client.sessionId].rotation = rotation;
 		//collision check
 		if (x < 0 || y < 0) { return; }

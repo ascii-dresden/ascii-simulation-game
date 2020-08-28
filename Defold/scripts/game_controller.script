@@ -11,6 +11,21 @@ local room
 -- 1 grid on server is this many pixel:
 local scaling = 100;
 local other_players = {}
+local customers = {}
+
+function drawCustomers(change)
+	if table.maxn(room.state.customers) > table.maxn(customers) then
+		created_id = factory.create("default:/customer_factory#factory", vmath.vector3(0,0,1), vmath.quat(),{},1)
+		customers[table.maxn(customers) +1] = created_id
+	elseif table.maxn(room.state.customers) < table.maxn(customers) then
+		table.remove(customers)
+	end
+	for pos,customer_id in pairs(customers) do
+		--lua starts indexing at 1 instead of 0 like everything else
+		newy = (pos-1) * scaling;
+		msg.post(customer_id, "Game State", {y = newy})
+	end
+end
 
 function onStateChange(change)
 	if room.state.players and room.state.players[id] then
@@ -35,6 +50,7 @@ function onStateChange(change)
 				
 			end
 		end
+		drawCustomers(change)
 	end
 	
 	

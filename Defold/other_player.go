@@ -1,6 +1,6 @@
 components {
-  id: "other_player"
-  component: "/scripts/other_player.script"
+  id: "customer"
+  component: "/scripts/customer.script.script"
   position {
     x: 0.0
     y: 0.0
@@ -16,8 +16,8 @@ components {
 embedded_components {
   id: "sprite"
   type: "sprite"
-  data: "tile_set: \"/other_player.atlas\"\n"
-  "default_animation: \"green_circle\"\n"
+  data: "tile_set: \"/customer.atlas.atlas\"\n"
+  "default_animation: \"Customer\"\n"
   "material: \"/builtins/materials/sprite.material\"\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
   ""
