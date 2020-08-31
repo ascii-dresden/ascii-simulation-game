@@ -19,17 +19,17 @@ class Player extends Schema {
 
 class Customer extends Schema {
 	@type({ map: "number" }) wants = new MapSchema<number>();
-	@type("boolean") hasPaid : boolean = false;
+	@type("boolean") hasPaid : boolean = true;
 
-	constructor(wants:MapSchema<number>, hasPaid?:boolean){
+	constructor(wants:MapSchema<number>,/* hasPaid?:boolean*/){
 		super();
 		this.wants = wants;
-		if(hasPaid){
+		/*if(hasPaid){
 			this.hasPaid = hasPaid
 		}
 		else{
 			this.hasPaid = true
-		}
+		}*/
 	}
 	
 }
@@ -212,10 +212,20 @@ export class Ascii extends Room {
   generateCustomer(){
   	if (this.state.customers.length >= 7) { return; }
 	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
-	  if(random > 7){
+	  if(random >= 7){
 	  	let wants = new MapSchema<number>();
-	  	wants["Kolle"] = 1;
-			this.state.createCustomer(wants)
+	  	switch(random) {
+	  		case 7:
+	  			wants["Kolle"] = 1;
+	  			break;
+	  		case 8:
+	  			wants["Zotrine"] = 1;
+	  			break;
+	  		default:
+	  			wants["Premium"] = 1;
+	  			break;
+	  	}
+		this.state.createCustomer(wants)
 	  }
   }
 

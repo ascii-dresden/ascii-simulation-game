@@ -23,10 +23,17 @@ function drawCustomers(change)
 		table.remove(customers)
 	end
 	for pos,customer_id in pairs(customers) do
-		print(room.state.customers[pos].wants["Kolle"])
 		--lua starts indexing at 1 instead of 0 like everything else
 		newy = (pos-1) * scaling + spriteCenter;
-		msg.post(customer_id, "Game State", {y = newy})
+		newtype = nil
+		if room.state.customers[pos].wants["Kolle"] then
+			newtype = "KolleCustomer"
+		elseif room.state.customers[pos].wants["Zotrine"] then
+			newtype = "ZotrineCustomer"
+		elseif room.state.customers[pos].wants["Premium"] then
+			newtype = "PremiumCustomer"
+		end
+		msg.post(customer_id, "Game State", {y = newy, type = newtype})
 	end
 end
 

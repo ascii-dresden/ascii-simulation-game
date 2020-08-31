@@ -1,5 +1,10 @@
 function on_message(self, message_id, message, sender)
-	local position = go.get_position();
-	position.y = message.y;
-	go.set_position(position);
+	if message.y then
+		local position = go.get_position();
+		position.y = message.y;
+		go.set_position(position);
+	end
+	if message.type then	
+		sprite.play_flipbook("#sprite",hash(message.type))
+	end
 end

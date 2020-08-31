@@ -1,5 +1,13 @@
 images {
-  image: "/Customer.png"
+  image: "/KolleCustomer.png"
+  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
+}
+images {
+  image: "/PremiumCustomer.png"
+  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
+}
+images {
+  image: "/ZotrineCustomer.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 margin: 0
