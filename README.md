@@ -14,7 +14,7 @@ npm start
 - run client using:
 cd Defold
 open game.project in defold
-- Project->Fetch Libaries
+- Project->Fetch Libraries
 
 Controlls:
 P to serve "Premium Cola"
