@@ -49,6 +49,11 @@ class State extends Schema {
 
 export class Ascii extends Room {
 	
+	//single Tick of the Timer
+	gametick() {
+		this.generateCustomer();
+	}
+	
 	fillResources() {
 		for (let item of max.keys()) {
 		this.state.Resources[item] = max.get(item);
@@ -160,7 +165,6 @@ export class Ascii extends Room {
 		if (hitbox.has(x*10+y)) { return; }
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
-		this.generateCustomer();
 	}
 	
 	onRefill(client: Client, data : any) {
@@ -189,6 +193,9 @@ export class Ascii extends Room {
 	  	this.onMessage("use", (client, message) => { this.onUse(client,message) });
 	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
 	  	this.onMessage("refill", (client, message) => { this.onRefill(client,message) });
+	  	//start game timer, number is intervall in milliseconds
+	  	setInterval(()=>{this.gametick()},1000);
+	  	
 	});
 	//fill hitbox with all its values
 	this.fillHitbox();
@@ -211,7 +218,7 @@ export class Ascii extends Room {
 
   generateCustomer(){
   	if (this.state.customers.length >= 7) { return; }
-	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
+	  var random : number = Math.floor(Math.random() * 20) // numbers between 0 and 10
 	  if(random >= 7){
 	  	let wants = new MapSchema<number>();
 	  	switch(random) {
