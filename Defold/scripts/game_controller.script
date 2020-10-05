@@ -49,7 +49,8 @@ function Move(change)
 		newx = room.state.players[id].x*scaling + spriteCenter;
 		newy = room.state.players[id].y*scaling + spriteCenter;
 		newrot = room.state.players[id].rotation * -90;
-		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot});
+		newinv = room.state.players[id].inventory
+		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot, inventory = newinv});
 
 		for other_id,value in pairs(room.state.players) do
 			if other_id ~= id and room.state.players[other_id].x and not other_players[other_id] then 
