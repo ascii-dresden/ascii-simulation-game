@@ -16,7 +16,7 @@ components {
 embedded_components {
   id: "sprite"
   type: "sprite"
-  data: "tile_set: \"/cool_bev.atlas\"\n"
+  data: "tile_set: \"/map.tilesource\"\n"
   "default_animation: \"Kolle\"\n"
   "material: \"/builtins/materials/sprite.material\"\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
