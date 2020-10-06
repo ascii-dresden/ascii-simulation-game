@@ -3,7 +3,7 @@ images {
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/BeverageSprites/Cola.png"
+  image: "/BeverageSprites/Premium.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
