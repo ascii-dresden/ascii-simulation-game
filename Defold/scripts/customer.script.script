@@ -1,0 +1,27 @@
+function init(self)
+	self.item = {}
+end
+
+function on_message(self, message_id, message, sender)
+	if message.y then
+		local position = go.get_position();
+		position.y = message.y;
+		go.set_position(position);
+	end
+	if message.type then	
+		sprite.play_flipbook("#sprite",hash(message.type))
+	end
+	if message.order and not self.order then
+			for k, v in pairs(message.order) do
+				if type(k) == "string" and type(v) == "number" then
+					local position = go.get_position();
+					created_id = factory.create("#order_factory", vmath.vector3(position.x, position.y,0.1), vmath.quat(),{},1)
+					if created_id then
+						self.order = true
+						msg.post(created_id, "Game State", {item = k, amount = v})
+					end			
+				end
+		end
+	end
+	
+end

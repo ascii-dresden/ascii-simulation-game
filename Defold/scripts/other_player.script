@@ -1,7 +1,6 @@
+local origRotation
 function init(self)
-	-- Add initialization code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
+	origRotation = go.get_rotation();
 end
 
 function final(self)
@@ -21,6 +20,7 @@ function on_message(self, message_id, message, sender)
 	position.x = message.x;
 	position.y = message.y;
 	go.set_position(position);
+	go.set_rotation(origRotation * vmath.quat_rotation_z(math.rad(message.rot)));
 end
 
 function on_input(self, action_id, action)

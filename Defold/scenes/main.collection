@@ -96,9 +96,29 @@ embedded_instances {
   "blend_mode: BLEND_MODE_ALPHA\\n"
   "\"\n"
   "  position {\n"
-  "    x: 50.0\n"
-  "    y: 50.0\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
   "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"item\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"tile_set: \\\"/cool_bev.atlas\\\"\\n"
+  "default_animation: \\\"Empty\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "blend_mode: BLEND_MODE_ALPHA\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.1\n"
   "  }\n"
   "  rotation {\n"
   "    x: 0.0\n"
@@ -109,9 +129,9 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 200.0
-    y: 100.0
-    z: 1.0
+    x: 250.0
+    y: 150.0
+    z: 0.5
   }
   rotation {
     x: 0.0
@@ -127,22 +147,7 @@ embedded_instances {
 }
 embedded_instances {
   id: "other_player_factory"
-  data: "components {\n"
-  "  id: \"other_player_factory\"\n"
-  "  component: \"/scripts/other_player_factory.script\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  "embedded_components {\n"
+  data: "embedded_components {\n"
   "  id: \"factory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/other_player.go\\\"\\n"
@@ -164,7 +169,45 @@ embedded_instances {
   position {
     x: 0.0
     y: 0.0
+    z: 0.1
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 0.5
+    y: 0.5
     z: 1.0
+  }
+}
+embedded_instances {
+  id: "customer_factory"
+  data: "embedded_components {\n"
+  "  id: \"factory\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/customer.go\\\"\\n"
+  "load_dynamically: false\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.1
   }
   rotation {
     x: 0.0

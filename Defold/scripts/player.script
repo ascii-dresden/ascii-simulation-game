@@ -1,7 +1,10 @@
+local origRotation
+
 local game_controller = "default:/main#game_controller"
 
 function init(self)                                 -- [1]
-	msg.post(".", "acquire_input_focus")            -- [2]
+	msg.post(".", "acquire_input_focus")
+	origRotation = go.get_rotation();
 end
 
 function final(self)                                -- [7]
@@ -19,14 +22,31 @@ function on_input(self, action_id, action)
 			msg.post(game_controller, "move", {dir = "right"});
 		elseif action_id == hash("left") then
 			msg.post(game_controller, "move", {dir = "left"});
+		elseif action_id == hash("drop") then
+			msg.post(game_controller, "drop");
+		elseif action_id == hash("use") then
+			msg.post(game_controller, "use");
+		elseif action_id == hash("refill") then --just for testing
+			msg.post(game_controller, "refill", {item = "all"});
 		end
 	end
 end
 
+function draw_inventory(inventory)
+	msg.post("#item", "play_animation", { id = hash(inventory) });
+	--item.play_flipbook("#item", hash(inventory))
+end
 
 function on_message(self, message_id, message, sender)
 	local position = go.get_position();
-	position.x = message.x;
-	position.y = message.y;
-	go.set_position(position);
+	if message.x and message.y then
+		position.x = message.x;
+		position.y = message.y;
+		go.set_position(position);
+		go.set_rotation(origRotation * vmath.quat_rotation_z(math.rad(message.rot)))
+	end
+	if message.inventory then
+		draw_inventory(message.inventory)
+	end	
 end
+

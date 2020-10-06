@@ -1,8 +1,14 @@
 import { Room, Client } from "colyseus";
-import { type, Schema, MapSchema } from '@colyseus/schema';
+import { type, Schema, MapSchema, ArraySchema } from '@colyseus/schema';
+const csv = require('csv-parser')
+const fs = require('fs')
 
-let hitbox = new Set();
-	
+var Requirements = new Map();
+var max = new Map([ //needs to have exactly the entries of the csv
+			["Milch",5],["Kaffeebohnen",5],["Espresso Bohnen",5],["Schokopulver",5],["Weiße Schokolade",5],
+			["Kolle",3],["Premium",3],["Zotrine",3]]);
+let hitbox = new Set();	
+
 //a single player
 class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
@@ -11,17 +17,43 @@ class Player extends Schema {
 	@type("number") rotation : number = 0;
 }
 
+class Customer extends Schema {
+	@type({ map: "number" }) wants = new MapSchema<number>();
+	@type("boolean") hasPaid : boolean = true;
+
+	constructor(wants:MapSchema<number>,/* hasPaid?:boolean*/){
+		super();
+		this.wants = wants;
+		/*if(hasPaid){
+			this.hasPaid = hasPaid
+		}
+		else{
+			this.hasPaid = true
+		}*/
+	}
+	
+}
+
 //state of the game in the current room
 class State extends Schema {
-	//demo for server connection
-	@type("string") currentBeverage: string = "Nothing";
-	//list of all players
 	@type({ map: Player }) players = new MapSchema<Player>();
+	@type({ map: "number" }) Resources = new MapSchema<number>();
+	@type("number") score = 0;
 	//function to create a new player for given id  
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
+	@type([Customer]) customers = new ArraySchema<Customer>();
+	createCustomer (wants: MapSchema<number>) { this.customers.push(new Customer(wants)); }
+
+
 }
 
 export class Ascii extends Room {
+	
+	fillResources() {
+		for (let item of max.keys()) {
+		this.state.Resources[item] = max.get(item);
+		}
+	}
 	
 	//fills hitbox set with its values forma: x*10+y
 	fillHitbox() {
@@ -36,10 +68,65 @@ export class Ascii extends Room {
 		//storage + fridge
 		hitbox.add(55).add(54).add(53).add(52);
 	}
-	//Message Handlers
-	onServe (client: Client, data : any) {
-		this.state.currentBeverage = data;
-    console.log(client.sessionId + " served: " +  this.state.currentBeverage);
+	
+	//returns false if not enough Resources were available
+	consume(Product : string) {
+		if (!Requirements.has(Product)) { return false; }
+		let requirement = Requirements.get(Product);
+		//check if every resource is available
+		for (let resource of requirement.keys()) {
+			if (this.state.Resources[resource] < requirement.get(resource)) { return false; } }
+		//consume Resources
+		for (let resource of requirement.keys()) {
+			this.state.Resources[resource] = this.state.Resources[resource] - requirement.get(resource); }
+		return true;
+	}
+	
+	//one type of "Use"
+	Produce (client : Client, data : string) {
+		if (this.state.players[client.sessionId].inventory != "Empty") { return; }
+		if (!this.consume(data)) { return; }
+		this.state.players[client.sessionId].inventory = data;
+	}
+	
+	CustomerHappy(pos : number) {
+		let customer = this.state.customers[pos];
+		for (let desire in customer.wants) {
+			if (customer.wants[desire] != 0) { return; }
+		}
+		if (!customer.hasPaid) { return; }
+		this.state.customers.splice(pos,1);
+		this.state.score = this.state.score + 10;
+	}
+	
+	//serving stuff to customers
+	Serve (client : Client, pos : number) {
+		let inv = this.state.players[client.sessionId].inventory;
+		if (this.state.customers.length <= pos) { return; }
+		if (Object.keys(this.state.customers[pos].wants).lastIndexOf(inv) == -1) { return; } //MapSchema.has()
+		if (this.state.customers[pos].wants[inv] == 0) { return; }
+		this.state.customers[pos].wants[inv]--;
+		this.state.players[client.sessionId].inventory = "Empty";
+		this.CustomerHappy(pos);
+	}
+	//Message Handlers	
+	//delegates the "use" command to the action that is relevant for current position
+	onUse(client : Client, data : any) {
+		let player = this.state.players[client.sessionId];
+		if (player.x == 8 && player.y == 4 && player.rotation == 1)
+			{ this.Produce(client,"Kolle"); return; }
+		if (player.x == 8 && player.y == 5 && player.rotation == 1)
+			{ this.Produce(client,"Premium"); return; }
+		if (player.x == 8 && player.y == 6 && player.rotation == 1)
+			{ this.Produce(client,"Zotrine"); return; }
+		if (player.x == 2 && player.rotation == 3)
+			{ this.Serve(client,player.y); return; }
+	}
+	
+	onDrop (client: Client, data : any) {
+		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
+		//TODO: do something usefull
+		this.state.players[client.sessionId].inventory = "Empty";
 	}
 	
 	//move messages say the client tried to walk 1 space to given direction
@@ -67,23 +154,47 @@ export class Ascii extends Room {
 				y = y - 1;
 				break;
 		}
-		console.log([x,y]);
 		this.state.players[client.sessionId].rotation = rotation;
 		//collision check
 		if (x < 0 || y < 0) { return; }
 		if (hitbox.has(x*10+y)) { return; }
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
+		this.generateCustomer();
 	}
 	
-	onCreate (options: any) {
-	  //fill hitbox with all its values
-	  this.fillHitbox();
-		this.setState(new State());
-		//link Message Handlers
-    this.onMessage("serve", (client, message) => { this.onServe(client,message) });
-    this.onMessage("move", (client, message) => { this.onMove(client,message) });
-
+	onRefill(client: Client, data : any) {
+		if (data == "all") { this.fillResources(); return; }
+		if (!max.has(data)) { return; }
+		this.state.Resources[data] = max.get(data);
+	}
+	
+  onCreate (options: any) {
+  	//read file
+  	//TODO: colyseus mapschema doc shows how ot loop through these wierd objects, makes code more variable
+  	fs.createReadStream('Resources.csv')
+  	.pipe(csv())
+  	.on('data', (data : any) => {	//data contains a single line of the csv as "object" (behaves like struct)
+  		let name : string = data["Getränk"]
+  		let req = new Map();
+		for (let resource of max.keys()) {
+			if (data[resource] == '') { continue; }
+			req.set(resource,parseInt(data[resource]));
+		}
+		Requirements.set(name,req);
+  	}).on('end', () => {	//callback after reading
+  		this.fillResources();
+  		//link Message Handlers
+		this.onMessage("move", (client, message) => { this.onMove(client,message) });
+	  	this.onMessage("use", (client, message) => { this.onUse(client,message) });
+	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
+	  	this.onMessage("refill", (client, message) => { this.onRefill(client,message) });
+	});
+	//fill hitbox with all its values
+	this.fillHitbox();
+	this.setState(new State());
+	
+	this.onMessage("*", (client, essage) => { console.log("Server isnt finished yet"); });
   }
 
   onJoin (client: Client, options: any) {
@@ -96,6 +207,26 @@ export class Ascii extends Room {
   }
 
   onDispose() {
+  }
+
+  generateCustomer(){
+  	if (this.state.customers.length >= 7) { return; }
+	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
+	  if(random >= 7){
+	  	let wants = new MapSchema<number>();
+	  	switch(random) {
+	  		case 7:
+	  			wants["Kolle"] = 1;
+	  			break;
+	  		case 8:
+	  			wants["Zotrine"] = 1;
+	  			break;
+	  		default:
+	  			wants["Premium"] = 1;
+	  			break;
+	  	}
+		this.state.createCustomer(wants)
+	  }
   }
 
 }
