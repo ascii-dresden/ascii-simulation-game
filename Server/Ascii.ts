@@ -130,7 +130,6 @@ export class Ascii extends Room {
 	
 	onDrop (client: Client, data : any) {
 		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
-		//TODO: do something usefull
 		this.state.players[client.sessionId].inventory = "Empty";
 	}
 	
@@ -175,14 +174,13 @@ export class Ascii extends Room {
 	
   onCreate (options: any) {
   	//read file
-  	//TODO: colyseus mapschema doc shows how ot loop through these wierd objects, makes code more variable
   	fs.createReadStream('Resources.csv')
   	.pipe(csv())
-  	.on('data', (data : any) => {	//data contains a single line of the csv as "object" (behaves like struct)
+  	.on('data', (data : any) => {	//data contains a single line of the csv as "object" (behaves somewhat like a map)
   		let name : string = data["Getränk"]
   		let req = new Map();
-		for (let resource of max.keys()) {
-			if (data[resource] == '') { continue; }
+		for (let resource of Object.keys(data)) {
+			if (data[resource] == '' || resource == "Getränk") { continue; }
 			req.set(resource,parseInt(data[resource]));
 		}
 		Requirements.set(name,req);
@@ -218,7 +216,7 @@ export class Ascii extends Room {
 
   generateCustomer(){
   	if (this.state.customers.length >= 7) { return; }
-	  var random : number = Math.floor(Math.random() * 20) // numbers between 0 and 10
+	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
 	  if(random >= 7){
 	  	let wants = new MapSchema<number>();
 	  	switch(random) {
