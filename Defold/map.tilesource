@@ -61,6 +61,15 @@ animations {
   flip_vertical: 0
 }
 animations {
+  id: "Kolle_Pfand"
+  start_tile: 38
+  end_tile: 38
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
   id: "Milk"
   start_tile: 7
   end_tile: 7
@@ -124,9 +133,27 @@ animations {
   flip_vertical: 0
 }
 animations {
+  id: "Premium_Pfand"
+  start_tile: 58
+  end_tile: 58
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
   id: "Zotrine"
   start_tile: 47
   end_tile: 47
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Zotrine_Pfand"
+  start_tile: 48
+  end_tile: 48
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0
