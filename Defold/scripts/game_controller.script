@@ -37,6 +37,15 @@ function drawCustomers(change)
 	end
 end
 
+function drawScore(change)
+	for k, v in pairs(change) do
+		if v['field'] == 'score' then
+			print(v['value'])
+			msg.post('/score', 'score', {score = v['value']})
+		end
+	end
+end
+
 -- maybe seperate server-client communication and object controller
 -- positions of interactable objects 
 local fullKolle   = {x = 8, y = 4, rotation = 1}
@@ -71,6 +80,7 @@ function Move(change)
 			end
 		end
 		drawCustomers(change)
+		drawScore(change)
 	end
 end
 
