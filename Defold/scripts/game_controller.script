@@ -40,7 +40,6 @@ end
 function drawScore(change)
 	for k, v in pairs(change) do
 		if v['field'] == 'score' then
-			print(v['value'])
 			msg.post('/score', 'score', {score = v['value']})
 		end
 	end

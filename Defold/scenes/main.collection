@@ -242,8 +242,8 @@ embedded_instances {
   "  id: \"label\"\n"
   "  type: \"label\"\n"
   "  data: \"size {\\n"
-  "  x: 128.0\\n"
-  "  y: 32.0\\n"
+  "  x: 148.0\\n"
+  "  y: 64.0\\n"
   "  z: 0.0\\n"
   "  w: 0.0\\n"
   "}\\n"
@@ -275,9 +275,9 @@ embedded_instances {
   "tracking: 0.0\\n"
   "pivot: PIVOT_W\\n"
   "blend_mode: BLEND_MODE_ALPHA\\n"
-  "line_break: false\\n"
+  "line_break: true\\n"
   "text: \\\"Label\\\"\\n"
-  "font: \\\"/builtins/fonts/system_font.font\\\"\\n"
+  "font: \\\"/larger.font\\\"\\n"
   "material: \\\"/builtins/fonts/label.material\\\"\\n"
   "\"\n"
   "  position {\n"
@@ -294,8 +294,8 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 900.0
-    y: 780.0
+    x: 850.0
+    y: 770.0
     z: 0.1
   }
   rotation {
