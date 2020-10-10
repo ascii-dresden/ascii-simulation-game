@@ -844,7 +844,7 @@ layers {
   cell {
     x: 9
     y: 4
-    tile: 12
+    tile: 10
     h_flip: 0
     v_flip: 0
   }
@@ -984,7 +984,7 @@ layers {
   cell {
     x: 9
     y: 6
-    tile: 10
+    tile: 12
     h_flip: 0
     v_flip: 0
   }
