@@ -3,7 +3,7 @@ local id
 -- SERVER VARS
 local server_adress = "localhost"
 local server_port = "2567"
-local debug = true
+local debug = false
 
 --VARS
 local client

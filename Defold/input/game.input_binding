@@ -27,6 +27,10 @@ key_trigger {
   action: "refill"
 }
 mouse_trigger {
-  input: MOUSE_BUTTON_1
+  input: MOUSE_BUTTON_LEFT
+  action: "use"
+}
+touch_trigger {
+  input: TOUCH_MULTI
   action: "touch"
 }
