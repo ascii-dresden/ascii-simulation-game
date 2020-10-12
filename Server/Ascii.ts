@@ -1,3 +1,4 @@
+import { hitbox } from "./hitbox"
 import { Room, Client } from "colyseus";
 import { type, Schema, MapSchema, ArraySchema } from '@colyseus/schema';
 const csv = require('csv-parser')
@@ -6,9 +7,7 @@ const fs = require('fs')
 var Requirements = new Map();
 var max = new Map([ //needs to have exactly the entries of the csv
 			["Milch",5],["Kaffeebohnen",5],["Espresso Bohnen",5],["Schokopulver",5],["Weiße Schokolade",5],
-			["Kolle",3],["Premium",3],["Zotrine",3]]);
-let hitbox = new Set();	
-
+			["Kolle",3],["Premium",3],["Zotrine",3]])
 //a single player
 class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
@@ -49,24 +48,15 @@ class State extends Schema {
 
 export class Ascii extends Room {
 	
+	//single Tick of the Timer
+	gametick() {
+		this.generateCustomer();
+	}
+	
 	fillResources() {
 		for (let item of max.keys()) {
 		this.state.Resources[item] = max.get(item);
 		}
-	}
-	
-	//fills hitbox set with its values forma: x*10+y
-	fillHitbox() {
-		//main counter
-		hitbox.add(10).add(11).add(12).add(13).add(14).add(15).add(16).add(17);
-		//top counter
-		hitbox.add(27).add(37).add(47).add(57).add(67).add(77).add(87).add(97);
-		//right side
-		hitbox.add(96).add(95).add(94).add(93).add(92).add(91).add(90);
-		//counter with cofee machine
-		hitbox.add(46).add(45).add(44).add(43).add(42).add(41);
-		//storage + fridge
-		hitbox.add(55).add(54).add(53).add(52);
 	}
 	
 	//returns false if not enough Resources were available
@@ -125,7 +115,6 @@ export class Ascii extends Room {
 	
 	onDrop (client: Client, data : any) {
 		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
-		//TODO: do something usefull
 		this.state.players[client.sessionId].inventory = "Empty";
 	}
 	
@@ -160,7 +149,6 @@ export class Ascii extends Room {
 		if (hitbox.has(x*10+y)) { return; }
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
-		this.generateCustomer();
 	}
 	
 	onRefill(client: Client, data : any) {
@@ -171,14 +159,13 @@ export class Ascii extends Room {
 	
   onCreate (options: any) {
   	//read file
-  	//TODO: colyseus mapschema doc shows how ot loop through these wierd objects, makes code more variable
   	fs.createReadStream('Resources.csv')
   	.pipe(csv())
-  	.on('data', (data : any) => {	//data contains a single line of the csv as "object" (behaves like struct)
+  	.on('data', (data : any) => {	//data contains a single line of the csv as "object" (behaves somewhat like a map)
   		let name : string = data["Getränk"]
   		let req = new Map();
-		for (let resource of max.keys()) {
-			if (data[resource] == '') { continue; }
+		for (let resource of Object.keys(data)) {
+			if (data[resource] == '' || resource == "Getränk") { continue; }
 			req.set(resource,parseInt(data[resource]));
 		}
 		Requirements.set(name,req);
@@ -189,9 +176,10 @@ export class Ascii extends Room {
 	  	this.onMessage("use", (client, message) => { this.onUse(client,message) });
 	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
 	  	this.onMessage("refill", (client, message) => { this.onRefill(client,message) });
+	  	//start game timer, number is intervall in milliseconds
+	  	setInterval(()=>{this.gametick()},1000);
+	  	
 	});
-	//fill hitbox with all its values
-	this.fillHitbox();
 	this.setState(new State());
 	
 	this.onMessage("*", (client, essage) => { console.log("Server isnt finished yet"); });
