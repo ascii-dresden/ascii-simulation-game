@@ -3,7 +3,7 @@ var hitbox = new Map([
 [27,"register"],													//put money        -> get score
 [57,"return zotrine"],[67,"return premium"],[77,"return kolle"],   	//put empty bottle -> get score
 //cup return where exactly?
-[96,"zotrine"],[95,"premium"],[94,"kolle"],							//get full bottle
+[96,"Zotrine"],[95,"Premium"],[94,"Kolle"],							//get full bottle
 [92,"sink"],[91,"sink"],											//just hitbox as of now
 [55,"milk"],[54,"espresso"],[53,"crema"],							//get refill stuff for coffee machine
 [52,"fridge"],														//just hitbox as of now

@@ -105,14 +105,16 @@ export class Ascii extends Room {
 		let player = this.state.players[client.sessionId];
 		let position = player.x * 10 + player.y;
 		if (! hitbox.has(position)) {return;}
-		/*if (player.x == 8 && player.y == 4 && player.rotation == 1)
-			{ this.Produce(client,"Kolle"); return; }
-		if (player.x == 8 && player.y == 5 && player.rotation == 1)
-			{ this.Produce(client,"Premium"); return; }
-		if (player.x == 8 && player.y == 6 && player.rotation == 1)
-			{ this.Produce(client,"Zotrine"); return; }
-		if (player.x == 2 && player.rotation == 3)
-			{ this.Serve(client,player.y); return; }*/
+		switch(hitbox.get(position).split(" ")[0]) {
+			case "counter":
+				this.Serve(client,hitbox.get(position).split(" ")[1]);
+				break;
+			case "Kolle":
+			case "Zotrine":
+			case "Premium":
+				this.Produce(client,hitbox.get(position));
+				break;
+		}		
 	}
 	
 	onDrop (client: Client, data : any) {
