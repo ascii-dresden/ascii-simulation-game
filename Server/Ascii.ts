@@ -13,7 +13,7 @@ class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
 	@type("number") y : number = 1;
 	@type("string") inventory : string = "Empty";
-	@type("number") rotation : number = 0;
+	@type("string") rotation : string = "down";
 }
 
 class Customer extends Schema {
@@ -103,13 +103,13 @@ export class Ascii extends Room {
 	//delegates the "use" command to the action that is relevant for current position
 	onUse(client : Client, data : any) {
 		let player = this.state.players[client.sessionId];
-		if (player.x == 8 && player.y == 4 && player.rotation == 1)
+		if (player.x == 8 && player.y == 4 && player.rotation == 'right')
 			{ this.Produce(client,"Kolle"); return; }
-		if (player.x == 8 && player.y == 5 && player.rotation == 1)
+		if (player.x == 8 && player.y == 5 && player.rotation == 'right')
 			{ this.Produce(client,"Premium"); return; }
-		if (player.x == 8 && player.y == 6 && player.rotation == 1)
+		if (player.x == 8 && player.y == 6 && player.rotation == 'right')
 			{ this.Produce(client,"Zotrine"); return; }
-		if (player.x == 2 && player.rotation == 3)
+		if (player.x == 2 && player.rotation == 'left')
 			{ this.Serve(client,player.y); return; }
 	}
 	
@@ -124,22 +124,18 @@ export class Ascii extends Room {
 		//position if the move would go through
 		var x : number = this.state.players[client.sessionId].x;
 		var y : number = this.state.players[client.sessionId].y;
-		var rotation : number = 0;
+		var rotation : string = data;
 		switch(data){
 			case "left":
-				rotation = 3;
 				x = x - 1;
 				break;
 			case "right":
-				rotation = 1;
 				x = x + 1;
 				break;
 			case "up":
-				rotation = 0;
 				y = y + 1;
 				break;
 			case "down":
-				rotation = 2;
 				y = y - 1;
 				break;
 		}
