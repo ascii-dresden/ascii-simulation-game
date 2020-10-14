@@ -103,14 +103,16 @@ export class Ascii extends Room {
 	//delegates the "use" command to the action that is relevant for current position
 	onUse(client : Client, data : any) {
 		let player = this.state.players[client.sessionId];
-		if (player.x == 8 && player.y == 4 && player.rotation == 1)
+		let position = player.x * 10 + player.y;
+		if (! hitbox.has(position)) {return;}
+		/*if (player.x == 8 && player.y == 4 && player.rotation == 1)
 			{ this.Produce(client,"Kolle"); return; }
 		if (player.x == 8 && player.y == 5 && player.rotation == 1)
 			{ this.Produce(client,"Premium"); return; }
 		if (player.x == 8 && player.y == 6 && player.rotation == 1)
 			{ this.Produce(client,"Zotrine"); return; }
 		if (player.x == 2 && player.rotation == 3)
-			{ this.Serve(client,player.y); return; }
+			{ this.Serve(client,player.y); return; }*/
 	}
 	
 	onDrop (client: Client, data : any) {

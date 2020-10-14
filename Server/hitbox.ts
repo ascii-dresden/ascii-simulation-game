@@ -1,13 +1,16 @@
 //exports the map from coordinate to hitbox type
 var hitbox = new Map([ 
-[27,"register"],[37,"register"],									//put money        -> get score
+[27,"register"],													//put money        -> get score
 [57,"return zotrine"],[67,"return premium"],[77,"return kolle"],   	//put empty bottle -> get score
 //cup return where exactly?
 [96,"zotrine"],[95,"premium"],[94,"kolle"],							//get full bottle
-[93,"sink"],[92,"sink"],[91,"sink"],[90,"sink"],					//just hitbox as of now
+[92,"sink"],[91,"sink"],											//just hitbox as of now
 [55,"milk"],[54,"espresso"],[53,"crema"],							//get refill stuff for coffee machine
 [52,"fridge"],														//just hitbox as of now
 [32,"machine coffee"],[33,"machine milk"],							//coffee machine sides differ for refill
+[31,"php"],															//php gives hard penalties when served to any customer
+[70,"trash"],														//trashcan allows to empty inventory
+[37,"table"],[93,"table"],[90,"table"]								//hitboxes with no specific meaning
 ])
 
 
