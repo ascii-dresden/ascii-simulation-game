@@ -48,7 +48,7 @@ function Move(change)
 	if room.state.players and room.state.players[id] then
 		newx = room.state.players[id].x*scaling + spriteCenter;
 		newy = room.state.players[id].y*scaling + spriteCenter;
-		newrot = room.state.players[id].rotation * -90;
+		newrot = room.state.players[id].rotation;
 		newinv = room.state.players[id].inventory
 		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot, inventory = newinv});
 
