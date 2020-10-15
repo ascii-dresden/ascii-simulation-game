@@ -15,4 +15,9 @@ function on_message(self, message_id, message, sender)
 		position.x = message.x;
 		go.set_position(position);
 	end
+	if message.y then
+		local position = go.get_position();
+		position.y = message.y;
+		go.set_position(position);
+	end
 end

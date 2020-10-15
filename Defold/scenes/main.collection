@@ -216,8 +216,8 @@ embedded_instances {
     w: 1.0
   }
   scale3 {
-    x: 0.5
-    y: 0.5
+    x: 3.125
+    y: 3.125
     z: 1.0
   }
 }

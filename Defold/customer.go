@@ -16,8 +16,8 @@ components {
 embedded_components {
   id: "sprite"
   type: "sprite"
-  data: "tile_set: \"/customer.atlas.atlas\"\n"
-  "default_animation: \"PremiumCustomer\"\n"
+  data: "tile_set: \"/map.tilesource\"\n"
+  "default_animation: \"Customer_1\"\n"
   "material: \"/builtins/materials/sprite.material\"\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
   ""
