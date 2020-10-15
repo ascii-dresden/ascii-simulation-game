@@ -195,20 +195,42 @@ export class Ascii extends Room {
 
   generateCustomer(){
   	if (this.state.customers.length >= 7) { return; }
-	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
+	  var random : number = Math.floor(Math.random() * 10); // numbers between 0 and 10
 	  if(random >= 7){
-	  	let wants = new MapSchema<number>();
-	  	switch(random) {
-	  		case 7:
-	  			wants["Kolle"] = 1;
-	  			break;
-	  		case 8:
-	  			wants["Zotrine"] = 1;
-	  			break;
-	  		default:
-	  			wants["Premium"] = 1;
-	  			break;
-	  	}
+		  var i:number;
+		  let wants = new MapSchema<number>();
+		  var amount : number = Math.floor(Math.random() * 3) + 1; // numbers between 1 and 4
+		  for (i=1; i<=amount; i++) {
+
+			  var random: number = Math.floor(Math.random() * 3); // numbers between 0 and 3
+
+			  switch (random) {
+				  case 0:
+				  		if(wants["Kolle"]){
+					  wants["Kolle"] = wants["Kolle"] + 1;
+						}
+				  		else{
+							wants["Kolle"] = 1
+						}
+					  break;
+				  case 1:
+					  if(wants["Zotrine"]){
+						  wants["Zotrine"] = wants["Zotrine"] + 1;
+					  }
+					  else{
+						  wants["Zotrine"] = 1
+					  }
+					  break;
+				  default:
+					  if(wants["Premium"]){
+						  wants["Premium"] = wants["Premium"] + 1;
+					  }
+					  else{
+						  wants["Premium"] = 1
+					  }
+					  break;
+			  }
+		  }
 		this.state.createCustomer(wants)
 	  }
   }
