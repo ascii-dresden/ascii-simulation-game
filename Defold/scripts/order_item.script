@@ -4,10 +4,10 @@ function on_message(self, message_id, message, sender)
 	-- Learn more: https://defold.com/manuals/message-passing/
 	-- Remove this function if not needed
 	if message.item then	
-		sprite.play_flipbook("#sprite",hash(message.item))
+		--sprite.play_flipbook("#sprite",hash(message.item))
 	end
 	if message.amount then
-		label.set_text("#label", message.amount)
+		label.set_text("#label", message.amount .. "x " .. message.item)
 	end
 		
 	if message.x then
