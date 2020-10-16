@@ -1,7 +1,7 @@
 //exports the map from coordinate to hitbox type
 var hitbox = new Map([ 
 [27,"register"],													//put money        -> get score
-[57,"return zotrine"],[67,"return premium"],[77,"return kolle"],   	//put empty bottle -> get score
+[57,"return Zotrine"],[67,"return Premium"],[77,"return Kolle"],   	//put empty bottle -> get score
 //cup return where exactly?
 [96,"Zotrine"],[95,"Premium"],[94,"Kolle"],							//get full bottle
 [92,"sink"],[91,"sink"],											//just hitbox as of now

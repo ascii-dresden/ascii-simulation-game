@@ -8,6 +8,7 @@ var Requirements = new Map();
 var max = new Map([ //needs to have exactly the entries of the csv
 			["Milch",5],["Kaffeebohnen",5],["Espresso Bohnen",5],["Schokopulver",5],["Weiße Schokolade",5],
 			["Kolle",3],["Premium",3],["Zotrine",3]])
+
 //a single player
 class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
@@ -91,9 +92,9 @@ export class Ascii extends Room {
 	}
 	
 	//one type of "Use"
-	Produce (client : Client, data : string) {
+	Produce (client : Client, data : string, consuming : boolean = true) {
 		if (this.state.players[client.sessionId].inventory != "Empty") { return; }
-		if (!this.consume(data)) { return; }
+		if (consuming) { if (!this.consume(data)) { return; } }
 		this.state.players[client.sessionId].inventory = data;
 	}
 	
@@ -111,19 +112,35 @@ export class Ascii extends Room {
 	Serve (client : Client, pos : number) {
 		let inv = this.state.players[client.sessionId].inventory;
 		if (this.state.customers.length <= pos) { return; }
-		if (Object.keys(this.state.customers[pos].wants).lastIndexOf(inv) == -1) { return; } //MapSchema.has()
-		if (this.state.customers[pos].wants[inv] == 0) { return; }
-		this.state.customers[pos].wants[inv]--;
-		this.state.players[client.sessionId].inventory = "Empty";
-		this.CustomerHappy(pos);
+		//customer wants beverage
+		for (let desire of (Object.keys(this.state.customers[pos].wants))) {
+			//returning empty stuff
+			if (desire.startsWith("Empty") || desire.endsWith("_Pfand")) {
+				if (this.state.players[client.sessionId].inventory != "Empty") {continue;}
+				this.state.players[client.sessionId].inventory = desire;
+			} else {
+				if (this.state.players[client.sessionId].inventory != desire) {continue;}
+				this.state.players[client.sessionId].inventory = "Empty";
+			}
+			this.state.customers[pos].wants[desire]--;
+			this.CustomerHappy(pos);
+		}
 	}
+	
+	//returning empty bottles
+	Return (client: Client, data: string) {
+		let wanted = data + "_Pfand";
+		if (this.state.players[client.sessionId].inventory != wanted) { return; }
+		this.state.players[client.sessionId].inventory = "Empty";
+		this.state.score = this.state.score + 10;
+	}
+	
 	//Message Handlers	
 	//delegates the "use" command to the action that is relevant for current position
 	onUse(client : Client, data : any) {
 		let player = this.state.players[client.sessionId];
 		let pos = this.direction(player.rotation,player.x,player.y); 
 		let position = pos[0]*10+pos[1];
-		console.log(position);
 		if (! hitbox.has(position)) {return;}
 		switch(hitbox.get(position).split(" ")[0]) {
 			case "counter":
@@ -132,7 +149,10 @@ export class Ascii extends Room {
 			case "Kolle":
 			case "Zotrine":
 			case "Premium":
-				this.Produce(client,hitbox.get(position));
+				this.Produce(client,hitbox.get(position),false);
+				break;
+			case "return":
+				this.Return(client,hitbox.get(position).split(" ")[1]);
 				break;
 		}		
 	}
@@ -209,18 +229,27 @@ export class Ascii extends Room {
 
   generateCustomer(){
   	if (this.state.customers.length >= 7) { return; }
-	  var random : number = Math.floor(Math.random() * 10) // numbers between 0 and 10
-	  if(random >= 7){
+	  var random : number = Math.floor(Math.random() * 20) // numbers between 0 and 20
+	  if(random >= 14){
 	  	let wants = new MapSchema<number>();
 	  	switch(random) {
-	  		case 7:
+	  		case 14:
 	  			wants["Kolle"] = 1;
 	  			break;
-	  		case 8:
+	  		case 15:
 	  			wants["Zotrine"] = 1;
 	  			break;
-	  		default:
+	  		case 16:
 	  			wants["Premium"] = 1;
+	  			break;
+	  		case 17:
+	  			wants["Kolle_Pfand"] = 1;
+	  			break;
+	  		case 18:
+	  			wants["Zotrine_Pfand"] = 1;
+	  			break;
+	  		case 19:
+	  			wants["Premium_Pfand"] = 1;
 	  			break;
 	  	}
 		this.state.createCustomer(wants)
