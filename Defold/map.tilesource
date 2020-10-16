@@ -52,6 +52,15 @@ animations {
   flip_vertical: 0
 }
 animations {
+  id: "Kasse"
+  start_tile: 42
+  end_tile: 42
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
   id: "Kolle"
   start_tile: 37
   end_tile: 37
@@ -82,6 +91,24 @@ animations {
   id: "Milk_Coffee_Cup"
   start_tile: 8
   end_tile: 8
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Money"
+  start_tile: 77
+  end_tile: 77
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "PHP_Cup"
+  start_tile: 67
+  end_tile: 67
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0

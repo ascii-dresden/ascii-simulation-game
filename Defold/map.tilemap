@@ -468,28 +468,28 @@ layers {
   cell {
     x: 0
     y: 8
-    tile: 24
+    tile: 99
     h_flip: 0
     v_flip: 0
   }
   cell {
     x: 1
     y: 8
-    tile: 24
+    tile: 99
     h_flip: 0
     v_flip: 0
   }
   cell {
     x: 2
     y: 8
-    tile: 24
+    tile: 99
     h_flip: 0
     v_flip: 0
   }
   cell {
     x: 3
     y: 8
-    tile: 24
+    tile: 99
     h_flip: 0
     v_flip: 0
   }
@@ -550,7 +550,7 @@ layers {
   cell {
     x: 7
     y: 0
-    tile: 68
+    tile: 25
     h_flip: 0
     v_flip: 0
   }
@@ -592,7 +592,7 @@ layers {
   cell {
     x: 3
     y: 1
-    tile: 68
+    tile: 44
     h_flip: 0
     v_flip: 0
   }
@@ -1005,7 +1005,7 @@ layers {
   cell {
     x: 2
     y: 7
-    tile: 22
+    tile: 41
     h_flip: 0
     v_flip: 0
   }

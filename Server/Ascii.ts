@@ -13,7 +13,7 @@ class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
 	@type("number") y : number = 1;
 	@type("string") inventory : string = "Empty";
-	@type("number") rotation : number = 0;
+	@type("string") rotation : string = "down";
 }
 
 class Customer extends Schema {
@@ -104,9 +104,7 @@ export class Ascii extends Room {
 	onUse(client : Client, data : any) {
 		let player = this.state.players[client.sessionId];
 		let position = player.x * 10 + player.y;
-		console.log(position)
 		if (! hitbox.has(position)) {return;}
-		console.log(hitbox.get(position));
 		switch(hitbox.get(position).split(" ")[0]) {
 			case "counter":
 				this.Serve(client,+hitbox.get(position).split(" ")[1]);
@@ -114,7 +112,6 @@ export class Ascii extends Room {
 			case "Kolle":
 			case "Zotrine":
 			case "Premium":
-				console.log(hitbox.get(position));
 				this.Produce(client,hitbox.get(position));
 				break;
 		}		
@@ -131,22 +128,18 @@ export class Ascii extends Room {
 		//position if the move would go through
 		var x : number = this.state.players[client.sessionId].x;
 		var y : number = this.state.players[client.sessionId].y;
-		var rotation : number = 0;
+		var rotation : string = data;
 		switch(data){
 			case "left":
-				rotation = 3;
 				x = x - 1;
 				break;
 			case "right":
-				rotation = 1;
 				x = x + 1;
 				break;
 			case "up":
-				rotation = 0;
 				y = y + 1;
 				break;
 			case "down":
-				rotation = 2;
 				y = y - 1;
 				break;
 		}
