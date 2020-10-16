@@ -3,7 +3,7 @@ local id
 -- SERVER VARS
 local server_adress = "localhost"
 local server_port = "2567"
-local debug = true
+local debug = false
 
 --VARS
 local client
@@ -83,7 +83,7 @@ function init(self)
 	if debug then
 		client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port,false)
 	else
-		server_adress = "asciigame.pvc.ifsr.de/api"
+		server_adress = "game.ascii.coffee/api"
 		client = ColyseusClient.new("wss://" .. server_adress,false)
 	end
 	client:join_or_create("Ascii", {}, function(err, room_instance)
