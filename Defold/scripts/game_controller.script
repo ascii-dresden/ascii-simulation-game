@@ -64,7 +64,7 @@ function Move(change)
 			elseif other_players[other_id] and other_id ~= id then
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
-				newrot = room.state.players[other_id].rotation * -90;
+				newrot = room.state.players[other_id].rotation;
 				-- go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
 				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot});
 
