@@ -104,14 +104,17 @@ export class Ascii extends Room {
 	onUse(client : Client, data : any) {
 		let player = this.state.players[client.sessionId];
 		let position = player.x * 10 + player.y;
+		console.log(position)
 		if (! hitbox.has(position)) {return;}
+		console.log(hitbox.get(position));
 		switch(hitbox.get(position).split(" ")[0]) {
 			case "counter":
-				this.Serve(client,hitbox.get(position).split(" ")[1]);
+				this.Serve(client,+hitbox.get(position).split(" ")[1]);
 				break;
 			case "Kolle":
 			case "Zotrine":
 			case "Premium":
+				console.log(hitbox.get(position));
 				this.Produce(client,hitbox.get(position));
 				break;
 		}		
@@ -149,8 +152,9 @@ export class Ascii extends Room {
 		}
 		this.state.players[client.sessionId].rotation = rotation;
 		//collision check
-		if (x < 0 || y < 0) { return; }
+		if (x < 0 || y < 0 || x>9 || y>7) { return; }
 		if (hitbox.has(x*10+y)) { return; }
+		//actually moving the player
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
 	}
