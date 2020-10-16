@@ -5,12 +5,11 @@ var hitbox = new Map([
 //cup return where exactly?
 [96,"Zotrine"],[95,"Premium"],[94,"Kolle"],							//get full bottle
 [92,"sink"],[91,"sink"],											//just hitbox as of now
-[55,"milk"],[54,"espresso"],[53,"crema"],							//get refill stuff for coffee machine
-[52,"fridge"],														//just hitbox as of now
+[55,"Milk"],[53,"Espresso_Beans"],[54,"Crema_Beans"],				//get refill stuff for coffee machine
 [32,"machine coffee"],[33,"machine milk"],							//coffee machine sides differ for refill
 [31,"php"],															//php gives hard penalties when served to any customer
 [70,"trash"],														//trashcan allows to empty inventory
-[37,"table"],[93,"table"],[90,"table"]								//hitboxes with no specific meaning
+[37,"table"],[93,"table"],[90,"table"],[52,"table"]					//hitboxes with no specific meaning
 ])
 
 

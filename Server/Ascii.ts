@@ -43,8 +43,6 @@ class State extends Schema {
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
 	@type([Customer]) customers = new ArraySchema<Customer>();
 	createCustomer (wants: MapSchema<number>) { this.customers.push(new Customer(wants)); }
-
-
 }
 
 export class Ascii extends Room {
@@ -130,6 +128,7 @@ export class Ascii extends Room {
 	//returning empty bottles
 	Return (client: Client, data: string) {
 		let wanted = data + "_Pfand";
+		if (data == "sink") { wanted = "Empty_Coffee_Cup"; }
 		if (this.state.players[client.sessionId].inventory != wanted) { return; }
 		this.state.players[client.sessionId].inventory = "Empty";
 		this.state.score = this.state.score + 10;
@@ -146,22 +145,28 @@ export class Ascii extends Room {
 			case "counter":
 				this.Serve(client,+hitbox.get(position).split(" ")[1]);
 				break;
-			case "Kolle":
-			case "Zotrine":
-			case "Premium":
-				this.Produce(client,hitbox.get(position),false);
+			case "php": 
+				this.Produce(client,"PHP_Cup",false);
 				break;
 			case "return":
 				this.Return(client,hitbox.get(position).split(" ")[1]);
 				break;
+			case "sink":
+				this.Return(client,"sink");
+				break;
+			case "trash":
+				this.state.players[client.sessionId].inventory = "Empty";
+				break;
+			case "wall":
+			case "table":
+				break; //default handles all new items from storage so this is for stuff that does nothing
+			//this handles all getting new stuff from storage
+			default:
+				this.Produce(client,hitbox.get(position),false);
+				break;
 		}		
 	}
-	
-	onDrop (client: Client, data : any) {
-		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
-		this.state.players[client.sessionId].inventory = "Empty";
-	}
-	
+		
 	//move messages say the client tried to walk 1 space to given direction
 	//collision check at server, update position AND rotation
 	onMove (client: Client, data : any) {
@@ -187,73 +192,74 @@ export class Ascii extends Room {
 		this.state.Resources[data] = max.get(data);
 	}
 	
-  onCreate (options: any) {
-  	//read file
-  	fs.createReadStream('Resources.csv')
-  	.pipe(csv())
-  	.on('data', (data : any) => {	//data contains a single line of the csv as "object" (behaves somewhat like a map)
-  		let name : string = data["Getränk"]
-  		let req = new Map();
-		for (let resource of Object.keys(data)) {
-			if (data[resource] == '' || resource == "Getränk") { continue; }
-			req.set(resource,parseInt(data[resource]));
-		}
-		Requirements.set(name,req);
-  	}).on('end', () => {	//callback after reading
-  		this.fillResources();
-  		//link Message Handlers
+	startup() {
+		this.fillResources();
+		//link Message Handlers
 		this.onMessage("move", (client, message) => { this.onMove(client,message) });
 	  	this.onMessage("use", (client, message) => { this.onUse(client,message) });
-	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
 	  	this.onMessage("refill", (client, message) => { this.onRefill(client,message) });
 	  	//start game timer, number is intervall in milliseconds
-	  	setInterval(()=>{this.gametick()},1000);
-	  	
-	});
-	this.setState(new State());
-	
-	this.onMessage("*", (client, essage) => { console.log("Server isnt finished yet"); });
-  }
+	  	setInterval(()=>{this.gametick()},1500);
+	}
+	onCreate (options: any) {
+		//read file
+		fs.createReadStream('Resources.csv')
+		.pipe(csv())
+		.on('data', (data : any) => {	
+			let name : string = data["Getränk"]
+			let req = new Map();
+			for (let resource of Object.keys(data)) {
+				if (data[resource] == '' || resource == "Getränk") { continue; }
+				req.set(resource,parseInt(data[resource]));
+			}
+			Requirements.set(name,req);
+		}).on('end', () => { this.startup(); });
+		this.setState(new State());
 
-  onJoin (client: Client, options: any) {
-  	client.send("id",client.sessionId);
-  	this.state.createPlayer(client.sessionId);
-  }
+		this.onMessage("*", (client, essage) => { console.log("Server isnt finished yet"); });
+		}
 
-  onLeave (client: Client, consented: boolean) {
-  	delete this.state.players[client.sessionId]
-  }
+	onJoin (client: Client, options: any) {
+		client.send("id",client.sessionId);
+		this.state.createPlayer(client.sessionId);
+	}
 
-  onDispose() {
-  }
+	onLeave (client: Client, consented: boolean) {
+		delete this.state.players[client.sessionId]
+	}
 
-  generateCustomer(){
-  	if (this.state.customers.length >= 7) { return; }
-	  var random : number = Math.floor(Math.random() * 20) // numbers between 0 and 20
-	  if(random >= 14){
-	  	let wants = new MapSchema<number>();
-	  	switch(random) {
-	  		case 14:
-	  			wants["Kolle"] = 1;
-	  			break;
-	  		case 15:
-	  			wants["Zotrine"] = 1;
-	  			break;
-	  		case 16:
-	  			wants["Premium"] = 1;
-	  			break;
-	  		case 17:
-	  			wants["Kolle_Pfand"] = 1;
-	  			break;
-	  		case 18:
-	  			wants["Zotrine_Pfand"] = 1;
-	  			break;
-	  		case 19:
-	  			wants["Premium_Pfand"] = 1;
-	  			break;
-	  	}
-		this.state.createCustomer(wants)
-	  }
-  }
+	onDispose() {
+	}
 
-}
+	generateCustomer(){
+		if (this.state.customers.length >= 7) { return; }
+		  var random : number = Math.floor(Math.random() * 20) // numbers between 0 and 20
+		  if(random >= 13){
+		  	let wants = new MapSchema<number>();
+		  	switch(random) {
+		  		case 13:
+		  			wants["Empty_Coffee_Cup"] = 1;
+		  			break;
+		  		case 14:
+		  			wants["Kolle"] = 1;
+		  			break;
+		  		case 15:
+		  			wants["Zotrine"] = 1;
+		  			break;
+		  		case 16:
+		  			wants["Premium"] = 1;
+		  			break;
+		  		case 17:
+		  			wants["Kolle_Pfand"] = 1;
+		  			break;
+		  		case 18:
+		  			wants["Zotrine_Pfand"] = 1;
+		  			break;
+		  		case 19:
+		  			wants["Premium_Pfand"] = 1;
+		  			break;
+		  	}
+			this.state.createCustomer(wants)
+		  }
+		}
+	}
