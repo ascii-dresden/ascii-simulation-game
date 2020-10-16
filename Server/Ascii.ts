@@ -108,17 +108,15 @@ export class Ascii extends Room {
 		this.state.players[client.sessionId].inventory = data;
 	}
 
-	CustomerHappy(pos: number) {
+	CustomerReceive(pos: number, desire : string) {
 		let customer = this.state.customers[pos];
-		for (let desire in customer.wants) {
-			if (customer.wants[desire] != 0) {
-				return;
-			}
+		this.state.customers[pos].wants[desire]--;
+		if (customer.wants[desire] == 0) {
+			delete this.state.customers[pos].wants[desire];
 		}
-		if (!customer.hasPaid) {
-			return;
-		}
-		this.state.customers.splice(pos, 1);
+		if (Object.keys(customer.wants).length != 0) { return; }
+		if (!customer.hasPaid) { return; }
+		this.state.customers.splice(pos,1);
 		this.state.score = this.state.score + 10;
 	}
 
@@ -142,8 +140,7 @@ export class Ascii extends Room {
 				}
 				this.state.players[client.sessionId].inventory = "Empty";
 			}
-			this.state.customers[pos].wants[desire]--;
-			this.CustomerHappy(pos);
+			this.CustomerReceive(pos,desire);
 		}
 	}
 
