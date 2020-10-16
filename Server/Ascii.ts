@@ -53,6 +53,24 @@ export class Ascii extends Room {
 		this.generateCustomer();
 	}
 	
+	direction(data : string, x : number, y : number) {
+		switch(data){
+			case "left":
+				x = x - 1;
+				break;
+			case "right":
+				x = x + 1;
+				break;
+			case "up":
+				y = y + 1;
+				break;
+			case "down":
+				y = y - 1;
+				break;
+		}
+		return [x,y]
+	}
+	
 	fillResources() {
 		for (let item of max.keys()) {
 		this.state.Resources[item] = max.get(item);
@@ -103,7 +121,9 @@ export class Ascii extends Room {
 	//delegates the "use" command to the action that is relevant for current position
 	onUse(client : Client, data : any) {
 		let player = this.state.players[client.sessionId];
-		let position = player.x * 10 + player.y;
+		let pos = this.direction(player.rotation,player.x,player.y); 
+		let position = pos[0]*10+pos[1];
+		console.log(position);
 		if (! hitbox.has(position)) {return;}
 		switch(hitbox.get(position).split(" ")[0]) {
 			case "counter":
@@ -129,20 +149,9 @@ export class Ascii extends Room {
 		var x : number = this.state.players[client.sessionId].x;
 		var y : number = this.state.players[client.sessionId].y;
 		var rotation : string = data;
-		switch(data){
-			case "left":
-				x = x - 1;
-				break;
-			case "right":
-				x = x + 1;
-				break;
-			case "up":
-				y = y + 1;
-				break;
-			case "down":
-				y = y - 1;
-				break;
-		}
+		let pos = this.direction(data,x,y);
+		x = pos[0];
+		y = pos[1];
 		this.state.players[client.sessionId].rotation = rotation;
 		//collision check
 		if (x < 0 || y < 0 || x>9 || y>7) { return; }
