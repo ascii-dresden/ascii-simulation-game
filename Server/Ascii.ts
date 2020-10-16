@@ -8,6 +8,7 @@ var Requirements = new Map();
 var max = new Map([ //needs to have exactly the entries of the csv
 			["Milch",5],["Kaffeebohnen",5],["Espresso Bohnen",5],["Schokopulver",5],["Weiße Schokolade",5],
 			["Kolle",3],["Premium",3],["Zotrine",3]])
+
 //a single player
 class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
@@ -42,90 +43,17 @@ class State extends Schema {
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
 	@type([Customer]) customers = new ArraySchema<Customer>();
 	createCustomer (wants: MapSchema<number>) { this.customers.push(new Customer(wants)); }
-
-
 }
 
 export class Ascii extends Room {
-	
+
 	//single Tick of the Timer
 	gametick() {
 		this.generateCustomer();
 	}
-	
-	fillResources() {
-		for (let item of max.keys()) {
-		this.state.Resources[item] = max.get(item);
-		}
-	}
-	
-	//returns false if not enough Resources were available
-	consume(Product : string) {
-		if (!Requirements.has(Product)) { return false; }
-		let requirement = Requirements.get(Product);
-		//check if every resource is available
-		for (let resource of requirement.keys()) {
-			if (this.state.Resources[resource] < requirement.get(resource)) { return false; } }
-		//consume Resources
-		for (let resource of requirement.keys()) {
-			this.state.Resources[resource] = this.state.Resources[resource] - requirement.get(resource); }
-		return true;
-	}
-	
-	//one type of "Use"
-	Produce (client : Client, data : string) {
-		if (this.state.players[client.sessionId].inventory != "Empty") { return; }
-		if (!this.consume(data)) { return; }
-		this.state.players[client.sessionId].inventory = data;
-	}
-	
-	CustomerHappy(pos : number) {
-		let customer = this.state.customers[pos];
-		for (let desire in customer.wants) {
-			if (customer.wants[desire] != 0) { return; }
-		}
-		if (!customer.hasPaid) { return; }
-		this.state.customers.splice(pos,1);
-		this.state.score = this.state.score + 10;
-	}
-	
-	//serving stuff to customers
-	Serve (client : Client, pos : number) {
-		let inv = this.state.players[client.sessionId].inventory;
-		if (this.state.customers.length <= pos) { return; }
-		if (Object.keys(this.state.customers[pos].wants).lastIndexOf(inv) == -1) { return; } //MapSchema.has()
-		if (this.state.customers[pos].wants[inv] == 0) { return; }
-		this.state.customers[pos].wants[inv]--;
-		this.state.players[client.sessionId].inventory = "Empty";
-		this.CustomerHappy(pos);
-	}
-	//Message Handlers	
-	//delegates the "use" command to the action that is relevant for current position
-	onUse(client : Client, data : any) {
-		let player = this.state.players[client.sessionId];
-		if (player.x == 8 && player.y == 4 && player.rotation == 'right')
-			{ this.Produce(client,"Kolle"); return; }
-		if (player.x == 8 && player.y == 5 && player.rotation == 'right')
-			{ this.Produce(client,"Premium"); return; }
-		if (player.x == 8 && player.y == 6 && player.rotation == 'right')
-			{ this.Produce(client,"Zotrine"); return; }
-		if (player.x == 2 && player.rotation == 'left')
-			{ this.Serve(client,player.y); return; }
-	}
-	
-	onDrop (client: Client, data : any) {
-		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
-		this.state.players[client.sessionId].inventory = "Empty";
-	}
-	
-	//move messages say the client tried to walk 1 space to given direction
-	//collision check at server, update position AND rotation
-	onMove (client: Client, data : any) {
-		//position if the move would go through
-		var x : number = this.state.players[client.sessionId].x;
-		var y : number = this.state.players[client.sessionId].y;
-		var rotation : string = data;
-		switch(data){
+
+	direction(data: string, x: number, y: number) {
+		switch (data) {
 			case "left":
 				x = x - 1;
 				break;
@@ -139,83 +67,245 @@ export class Ascii extends Room {
 				y = y - 1;
 				break;
 		}
+		return [x, y]
+	}
+
+	fillResources() {
+		for (let item of max.keys()) {
+			this.state.Resources[item] = max.get(item);
+		}
+	}
+
+	//returns false if not enough Resources were available
+	consume(Product: string) {
+		if (!Requirements.has(Product)) {
+			return false;
+		}
+		let requirement = Requirements.get(Product);
+		//check if every resource is available
+		for (let resource of requirement.keys()) {
+			if (this.state.Resources[resource] < requirement.get(resource)) {
+				return false;
+			}
+		}
+		//consume Resources
+		for (let resource of requirement.keys()) {
+			this.state.Resources[resource] = this.state.Resources[resource] - requirement.get(resource);
+		}
+		return true;
+	}
+
+	//one type of "Use"
+	Produce(client: Client, data: string, consuming: boolean = true) {
+		if (this.state.players[client.sessionId].inventory != "Empty") {
+			return;
+		}
+		if (consuming) {
+			if (!this.consume(data)) {
+				return;
+			}
+		}
+		this.state.players[client.sessionId].inventory = data;
+	}
+
+	CustomerHappy(pos: number) {
+		let customer = this.state.customers[pos];
+		for (let desire in customer.wants) {
+			if (customer.wants[desire] != 0) {
+				return;
+			}
+		}
+		if (!customer.hasPaid) {
+			return;
+		}
+		this.state.customers.splice(pos, 1);
+		this.state.score = this.state.score + 10;
+	}
+
+	//serving stuff to customers
+	Serve(client: Client, pos: number) {
+		let inv = this.state.players[client.sessionId].inventory;
+		if (this.state.customers.length <= pos) {
+			return;
+		}
+		//customer wants beverage
+		for (let desire of (Object.keys(this.state.customers[pos].wants))) {
+			//returning empty stuff
+			if (desire.startsWith("Empty") || desire.endsWith("_Pfand")) {
+				if (this.state.players[client.sessionId].inventory != "Empty") {
+					continue;
+				}
+				this.state.players[client.sessionId].inventory = desire;
+			} else {
+				if (this.state.players[client.sessionId].inventory != desire) {
+					continue;
+				}
+				this.state.players[client.sessionId].inventory = "Empty";
+			}
+			this.state.customers[pos].wants[desire]--;
+			this.CustomerHappy(pos);
+		}
+	}
+
+	//returning empty bottles
+	Return(client: Client, data: string) {
+		let wanted = data + "_Pfand";
+		if (data == "sink") {
+			wanted = "Empty_Coffee_Cup";
+		}
+		if (this.state.players[client.sessionId].inventory != wanted) {
+			return;
+		}
+		this.state.players[client.sessionId].inventory = "Empty";
+		this.state.score = this.state.score + 10;
+	}
+
+	//Message Handlers	
+	//delegates the "use" command to the action that is relevant for current position
+	onUse(client: Client, data: any) {
+		let player = this.state.players[client.sessionId];
+		let pos = this.direction(player.rotation, player.x, player.y);
+		let position = pos[0] * 10 + pos[1];
+		if (!hitbox.has(position)) {
+			return;
+		}
+		switch (hitbox.get(position).split(" ")[0]) {
+			case "counter":
+				this.Serve(client, +hitbox.get(position).split(" ")[1]);
+				break;
+			case "php":
+				this.Produce(client, "PHP_Cup", false);
+				break;
+			case "return":
+				this.Return(client, hitbox.get(position).split(" ")[1]);
+				break;
+			case "sink":
+				this.Return(client, "sink");
+				break;
+			case "trash":
+				this.state.players[client.sessionId].inventory = "Empty";
+				break;
+			case "wall":
+			case "table":
+				break; //default handles all new items from storage so this is for stuff that does nothing
+			//this handles all getting new stuff from storage
+			default:
+				this.Produce(client, hitbox.get(position), false);
+				break;
+		}
+	}
+
+	//move messages say the client tried to walk 1 space to given direction
+	//collision check at server, update position AND rotation
+	onMove(client: Client, data: any) {
+		//position if the move would go through
+		var x: number = this.state.players[client.sessionId].x;
+		var y: number = this.state.players[client.sessionId].y;
+		var rotation: string = data;
+		let pos = this.direction(data, x, y);
+		x = pos[0];
+		y = pos[1];
 		this.state.players[client.sessionId].rotation = rotation;
 		//collision check
-		if (x < 0 || y < 0) { return; }
-		if (hitbox.has(x*10+y)) { return; }
+		if (x < 0 || y < 0 || x > 9 || y > 7) {
+			return;
+		}
+		if (hitbox.has(x * 10 + y)) {
+			return;
+		}
+		//actually moving the player
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
 	}
-	
-	onRefill(client: Client, data : any) {
-		if (data == "all") { this.fillResources(); return; }
-		if (!max.has(data)) { return; }
+
+	onRefill(client: Client, data: any) {
+		if (data == "all") {
+			this.fillResources();
+			return;
+		}
+		if (!max.has(data)) {
+			return;
+		}
 		this.state.Resources[data] = max.get(data);
 	}
-	
-  onCreate (options: any) {
-  	//read file
-  	fs.createReadStream('Resources.csv')
-  	.pipe(csv())
-  	.on('data', (data : any) => {	//data contains a single line of the csv as "object" (behaves somewhat like a map)
-  		let name : string = data["Getränk"]
-  		let req = new Map();
-		for (let resource of Object.keys(data)) {
-			if (data[resource] == '' || resource == "Getränk") { continue; }
-			req.set(resource,parseInt(data[resource]));
+
+	startup() {
+		this.fillResources();
+		//link Message Handlers
+		this.onMessage("move", (client, message) => {
+			this.onMove(client, message)
+		});
+		this.onMessage("use", (client, message) => {
+			this.onUse(client, message)
+		});
+		this.onMessage("refill", (client, message) => {
+			this.onRefill(client, message)
+		});
+		//start game timer, number is intervall in milliseconds
+		setInterval(() => {
+			this.gametick()
+		}, 1500);
+	}
+
+	onCreate(options: any) {
+		//read file
+		fs.createReadStream('Resources.csv')
+			.pipe(csv())
+			.on('data', (data: any) => {
+				let name: string = data["Getränk"]
+				let req = new Map();
+				for (let resource of Object.keys(data)) {
+					if (data[resource] == '' || resource == "Getränk") {
+						continue;
+					}
+					req.set(resource, parseInt(data[resource]));
+				}
+				Requirements.set(name, req);
+			}).on('end', () => {
+			this.startup();
+		});
+		this.setState(new State());
+
+		this.onMessage("*", (client, essage) => {
+			console.log("Server isnt finished yet");
+		});
+	}
+
+	onJoin(client: Client, options: any) {
+		client.send("id", client.sessionId);
+		this.state.createPlayer(client.sessionId);
+	}
+
+	onLeave(client: Client, consented: boolean) {
+		delete this.state.players[client.sessionId]
+	}
+
+	onDispose() {
+	}
+
+	generateCustomer() {
+		if (this.state.customers.length >= 7) {
+			return;
 		}
-		Requirements.set(name,req);
-  	}).on('end', () => {	//callback after reading
-  		this.fillResources();
-  		//link Message Handlers
-		this.onMessage("move", (client, message) => { this.onMove(client,message) });
-	  	this.onMessage("use", (client, message) => { this.onUse(client,message) });
-	  	this.onMessage("drop", (client, message) => { this.onDrop(client,message) });
-	  	this.onMessage("refill", (client, message) => { this.onRefill(client,message) });
-	  	//start game timer, number is intervall in milliseconds
-	  	setInterval(()=>{this.gametick()},1000);
-	  	
-	});
-	this.setState(new State());
-	
-	this.onMessage("*", (client, essage) => { console.log("Server isnt finished yet"); });
-  }
+		var random: number = Math.floor(Math.random() * 20); // numbers between 0 and 10
+		if (random >= 13) {
+			var order_items: string[] = ["Kolle", "Zotrine", "Premium", "Empty_Coffee_Cup", "Kolle_Pfand", "Zotrine_Pfand", "Premium_Pfand"]
+			var order_item: string = ''
+			var i: number;
+			let wants = new MapSchema<number>();
+			var amount: number = Math.floor(Math.random() * 3) + 1; // numbers between 1 and 4
+			for (i = 1; i <= amount; i++) {
 
-  onJoin (client: Client, options: any) {
-  	client.send("id",client.sessionId);
-  	this.state.createPlayer(client.sessionId);
-  }
+				var random: number = Math.floor(Math.random() * order_items.length); // numbers between 0 and 3
+				order_item = order_items[random]
 
-  onLeave (client: Client, consented: boolean) {
-  	delete this.state.players[client.sessionId]
-  }
-
-  onDispose() {
-  }
-
-  generateCustomer(){
-  	if (this.state.customers.length >= 7) { return; }
-	  var random : number = Math.floor(Math.random() * 10); // numbers between 0 and 10
-	  if(random >= 7){
-		  var order_items:string[]= ["Kolle","Zotrine", "Premium"]
-		  var order_item:string =''
-		  var i:number;
-		  let wants = new MapSchema<number>();
-		  var amount : number = Math.floor(Math.random() * 3) + 1; // numbers between 1 and 4
-		  for (i=1; i<=amount; i++) {
-
-			  var random: number = Math.floor(Math.random() * order_items.length); // numbers between 0 and 3
-			  order_item = order_items[random]
-
-				  		if(wants[order_item]){
-					  wants[order_item] = wants[order_item] + 1;
-						}
-				  		else{
-							wants[order_item] = 1
-						}
-		  }
-		this.state.createCustomer(wants)
-	  }
-  }
-
+				if (wants[order_item]) {
+					wants[order_item] = wants[order_item] + 1;
+				} else {
+					wants[order_item] = 1
+				}
+			}
+			this.state.createCustomer(wants)
+		}
+	}
 }
