@@ -152,8 +152,8 @@ animations {
 }
 animations {
   id: "Money"
-  start_tile: 77
-  end_tile: 77
+  start_tile: 68
+  end_tile: 68
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0
