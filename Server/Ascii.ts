@@ -72,10 +72,15 @@ export class Ascii extends Room {
 
 	//returns false if not enough Resources were available
 	consume(Product: string) {
-		if (!Requirements.has(Product)) {
-			return false;
+		let requirement = new Map();
+		if (Product == "Coffee_Cup") { 
+			requirement.set("Crema_Beans",1);
 		}
-		let requirement = Requirements.get(Product);
+		else if (Product == "Milk_Coffee_Cup") {
+			requirement.set("Espresso_Beans",1);
+			requirement.set("Milk",2);
+		}
+		else { return false; }
 		//check if every resource is available
 		for (let resource of requirement.keys()) {
 			if (this.state.Resources[resource] < requirement.get(resource)) {
@@ -267,7 +272,6 @@ export class Ascii extends Room {
 			this.gametick()
 		}, 1500);
 	}
-	
 
 	onJoin(client: Client, options: any) {
 		client.send("id", client.sessionId);
