@@ -1,13 +1,8 @@
 import { hitbox } from "./hitbox"
 import { Room, Client } from "colyseus";
 import { type, Schema, MapSchema, ArraySchema } from '@colyseus/schema';
-const csv = require('csv-parser')
-const fs = require('fs')
 
-var Requirements = new Map();
-var max = new Map([ //needs to have exactly the entries of the csv
-			["Milch",5],["Kaffeebohnen",5],["Espresso Bohnen",5],["Schokopulver",5],["Weiße Schokolade",5],
-			["Kolle",3],["Premium",3],["Zotrine",3]])
+var max = new Map([["Crema_Beans",5],["Espresso_Beans",5],["Milk",6]]);
 
 //a single player
 class Player extends Schema {
@@ -78,8 +73,15 @@ export class Ascii extends Room {
 	
 	//returns false if not enough Resources were available
 	consume(Product : string) {
-		if (!Requirements.has(Product)) { return false; }
-		let requirement = Requirements.get(Product);
+		let requirement = new Map();
+		if (Product == "Coffee_Cup") { 
+			requirement.set("Crema_Beans",1);
+		}
+		else if (Product == "Milk_Coffee_Cup") {
+			requirement.set("Espresso_Beans",1);
+			requirement.set("Milk",2);
+		}
+		else { return false; }
 		//check if every resource is available
 		for (let resource of requirement.keys()) {
 			if (this.state.Resources[resource] < requirement.get(resource)) { return false; } }
@@ -125,6 +127,27 @@ export class Ascii extends Room {
 		}
 	}
 	
+	//Refills storage of given item from player inventory
+	Refill(client: Client, item : string) {
+		//check if player has the right item
+		if (this.state.players[client.sessionId].inventory != item) { return; }
+		this.state.Resources[item] = max.get(item);
+		this.state.players[client.sessionId].inventory = "Empty";
+	}
+	
+	//this can be either getting coffee, or refilling, and handles both sides of the machine
+	Machine(client: Client, side : string) {
+		//both Produce and Refill methods check if the player has the valid inventory state
+		if (side == "milk") {
+			this.Produce(client,"Milk_Coffee_Cup");
+			this.Refill(client,"Milk");
+		}
+		else {
+			this.Produce(client,"Coffee_Cup");
+			this.Refill(client,"Crema_Beans");
+			this.Refill(client,"Espresso_Beans");
+		}	
+	}
 	//returning empty bottles
 	Return (client: Client, data: string) {
 		let wanted = data + "_Pfand";
@@ -141,15 +164,16 @@ export class Ascii extends Room {
 		let pos = this.direction(player.rotation,player.x,player.y); 
 		let position = pos[0]*10+pos[1];
 		if (! hitbox.has(position)) {return;}
-		switch(hitbox.get(position).split(" ")[0]) {
+		let boxname = hitbox.get(position).split(" ");
+		switch(boxname[0]) {
 			case "counter":
-				this.Serve(client,+hitbox.get(position).split(" ")[1]);
+				this.Serve(client,+boxname[1]);
 				break;
 			case "php": 
 				this.Produce(client,"PHP_Cup",false);
 				break;
 			case "return":
-				this.Return(client,hitbox.get(position).split(" ")[1]);
+				this.Return(client,boxname[1]);
 				break;
 			case "sink":
 				this.Return(client,"sink");
@@ -157,10 +181,12 @@ export class Ascii extends Room {
 			case "trash":
 				this.state.players[client.sessionId].inventory = "Empty";
 				break;
+			case "machine":
+				this.Machine(client,boxname[1]);
+				break;
 			case "wall":
 			case "table":
 				break; //default handles all new items from storage so this is for stuff that does nothing
-			//this handles all getting new stuff from storage
 			default:
 				this.Produce(client,hitbox.get(position),false);
 				break;
@@ -191,8 +217,9 @@ export class Ascii extends Room {
 		if (!max.has(data)) { return; }
 		this.state.Resources[data] = max.get(data);
 	}
-	
-	startup() {
+
+	onCreate (options: any) {
+		this.setState(new State());
 		this.fillResources();
 		//link Message Handlers
 		this.onMessage("move", (client, message) => { this.onMove(client,message) });
@@ -201,23 +228,6 @@ export class Ascii extends Room {
 	  	//start game timer, number is intervall in milliseconds
 	  	setInterval(()=>{this.gametick()},1500);
 	}
-	onCreate (options: any) {
-		//read file
-		fs.createReadStream('Resources.csv')
-		.pipe(csv())
-		.on('data', (data : any) => {	
-			let name : string = data["Getränk"]
-			let req = new Map();
-			for (let resource of Object.keys(data)) {
-				if (data[resource] == '' || resource == "Getränk") { continue; }
-				req.set(resource,parseInt(data[resource]));
-			}
-			Requirements.set(name,req);
-		}).on('end', () => { this.startup(); });
-		this.setState(new State());
-
-		this.onMessage("*", (client, essage) => { console.log("Server isnt finished yet"); });
-		}
 
 	onJoin (client: Client, options: any) {
 		client.send("id",client.sessionId);
