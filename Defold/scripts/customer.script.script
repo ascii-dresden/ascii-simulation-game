@@ -1,6 +1,7 @@
 function init(self)
 	self.items = {}
 	self.item_count = 0
+	
 end
 
 function delete_items(items)
@@ -21,6 +22,9 @@ function update_item_positions(items)
 end
 
 function on_message(self, message_id, message, sender)
+	if message.sprite_id then
+		sprite.play_flipbook("#sprite",hash("Customer_".. message.sprite_id))
+	end
 	if message.y then
 		local position = go.get_position();
 		position.y = message.y;

@@ -21,11 +21,14 @@ class Customer extends Schema {
 	@type({ map: "number" }) wants = new MapSchema<number>();
 	@type("boolean") waiting : boolean = true;
 	@type("number") id : number;
+	@type("number") sprite_id : number;
 
 	constructor(wants:MapSchema<number>, id:number){
 		super();
 		this.wants = wants;
 		this.id = id;
+		this.sprite_id = Math.floor(Math.random() * 1.99) + 1; // numbers between 1 and 2
+
 	}
 	
 }

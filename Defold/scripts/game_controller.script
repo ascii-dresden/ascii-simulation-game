@@ -42,6 +42,8 @@ function drawCustomers(change)
 			created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,0.1), vmath.quat(),{},3.125)
 			customers[customer.id] = created_id
 			print('created customer id:' ..customer.id)
+			msg.post(customer_go, "Game State", {sprite_id = customer.sprite_id})
+			
 
 		end
 		--update all customer
@@ -87,8 +89,8 @@ function Move(change)
 			elseif other_players[other_id] and other_id ~= id then
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
-				newrot = room.state.players[other_id].rotation * -90;
-				-- go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
+				newrot = room.state.players[other_id].rotation ;
+				go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
 				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot});
 
 			end
