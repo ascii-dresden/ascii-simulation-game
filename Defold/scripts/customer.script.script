@@ -1,6 +1,23 @@
 function init(self)
-	self.item = {}
+	self.items = {}
 	self.item_count = 0
+end
+
+function delete_items(items)
+	if items then
+		for _, id in pairs(items) do
+			go.delete(id)
+		end
+	end
+end
+
+function update_item_positions(items)
+	if items then
+		local position = go.get_position();
+		for pos, id in pairs(items) do
+			msg.post(id, "Game State", {x = position.x, y = position.y - (pos-1) * 20})
+		end
+	end
 end
 
 function on_message(self, message_id, message, sender)
@@ -8,27 +25,39 @@ function on_message(self, message_id, message, sender)
 		local position = go.get_position();
 		position.y = message.y;
 		go.set_position(position);
+		update_item_positions(self.items)
 	end
+	if message.x then
+		local position = go.get_position();
+		position.x = message.x;
+		go.set_position(position);
+		update_item_positions(self.items)
+	end
+	
 	if message.type then	
 		--sprite.play_flipbook("#sprite",hash(message.type))
 	end
 	if message.order and not self.order then
+		--delete_items(self.items)
 			for k, v in pairs(message.order) do
-				if type(k) == "string" and type(v) == "number" then
+				if k ~= '__keys' then
 					local position = go.get_position();
 					created_id = factory.create("#order_factory", vmath.vector3(position.x , position.y- self.item_count * 20,0.1), vmath.quat(),{},1)
 					if created_id then
 						self.order = true
 						msg.post(created_id, "Game State", {item = k, amount = v})
-						self.item = created_id
+						table.insert(self.items, created_id)
 						self.item_count = self.item_count +1
 					end			
-				end
+				
+			end
 		end
 	end
 	
 end
 
+
+
 function final(self)
-	go.delete(self.item)
+	delete_items(self.items)
 end

@@ -14,26 +14,50 @@ local spriteCenter = 50;
 local other_players = {}
 local customers = {}
 
-function drawCustomers(change)
-	if table.maxn(room.state.customers) > table.maxn(customers) then
-		created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,0.1), vmath.quat(),{},3.125)
-		customers[table.maxn(customers) +1] = created_id
-	elseif table.maxn(room.state.customers) < table.maxn(customers) then
-		go.delete(customers[table.maxn(customers)])
-		table.remove(customers)
+function setContains(set, key)
+	return set[key] ~= nil
+end
+
+function gamestateHasCustomer(id)
+	for k,v in pairs(room.state.customers) do
+		if v.id == id then
+			return true
+		end
 	end
-	for pos,customer_id in pairs(customers) do
+	return false
+end
+
+function drawCustomers(change)
+	--update and add customers from gamestate
+
+
+	for pos, customer in pairs(room.state.customers) do
+		print(pos, customer.id)
+	end	
+	
+	for pos, customer in pairs(room.state.customers) do
+		
+		if not setContains(customers, customer.id) then
+			-- create new customer if not yet created
+			created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,0.1), vmath.quat(),{},3.125)
+			customers[customer.id] = created_id
+			print('created customer id:' ..customer.id)
+
+		end
+		--update all customer
 		--lua starts indexing at 1 instead of 0 like everything else
 		newy = (pos-1) * scaling + spriteCenter;
-		newtype = nil
-		if room.state.customers[pos].wants["Kolle"] then
-			newtype = "KolleCustomer"
-		elseif room.state.customers[pos].wants["Zotrine"] then
-			newtype = "ZotrineCustomer"
-		elseif room.state.customers[pos].wants["Premium"] then
-			newtype = "PremiumCustomer"
+		customer_go = customers[customer.id]
+		msg.post(customer_go, "Game State", {y = newy, order = customer.wants})
+	end
+
+	-- remove customers not in gamestate
+
+	for customer_id, customer_go in pairs(customers) do
+		if not gamestateHasCustomer(customer_id) then
+			go.delete(customers[customer_id])
+			table.remove(customers, customer_id)
 		end
-		msg.post(customer_id, "Game State", {y = newy, type = newtype, order = room.state.customers[pos].wants})
 	end
 end
 
@@ -54,7 +78,6 @@ function Move(change)
 
 		for other_id,value in pairs(room.state.players) do
 			if other_id ~= id and room.state.players[other_id].x and not other_players[other_id] then 
-				print(other_id, room.state.players[other_id])
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
 
@@ -70,12 +93,16 @@ function Move(change)
 
 			end
 		end
-		drawCustomers(change)
 	end
 end
 
 function onStateChange(change)
 	Move(change)
+	for k, v in pairs(change) do
+		if v['field'] == 'customers' then
+			drawCustomers(change)
+		end
+	end
 end
 
 

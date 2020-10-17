@@ -19,17 +19,13 @@ class Player extends Schema {
 
 class Customer extends Schema {
 	@type({ map: "number" }) wants = new MapSchema<number>();
-	@type("boolean") hasPaid : boolean = true;
+	@type("boolean") waiting : boolean = true;
+	@type("number") id : number;
 
-	constructor(wants:MapSchema<number>,/* hasPaid?:boolean*/){
+	constructor(wants:MapSchema<number>, id:number){
 		super();
 		this.wants = wants;
-		/*if(hasPaid){
-			this.hasPaid = hasPaid
-		}
-		else{
-			this.hasPaid = true
-		}*/
+		this.id = id;
 	}
 	
 }
@@ -42,11 +38,11 @@ class State extends Schema {
 	//function to create a new player for given id  
 	createPlayer (id: string) { this.players[ id ] = new Player(); }
 	@type([Customer]) customers = new ArraySchema<Customer>();
-	createCustomer (wants: MapSchema<number>) { this.customers.push(new Customer(wants)); }
+	createCustomer (wants: MapSchema<number>, id: number) { this.customers.push(new Customer(wants, id)); }
 }
 
 export class Ascii extends Room {
-
+	customerMaxId = 0;
 	//single Tick of the Timer
 	gametick() {
 		this.generateCustomer();
@@ -115,8 +111,10 @@ export class Ascii extends Room {
 			delete this.state.customers[pos].wants[desire];
 		}
 		if (Object.keys(customer.wants).length != 0) { return; }
-		if (!customer.hasPaid) { return; }
 		this.state.customers.splice(pos,1);
+		for (let cust of (this.state.customers)) {
+			console.log(cust.id)
+		}
 		this.state.score = this.state.score + 10;
 	}
 
@@ -242,6 +240,8 @@ export class Ascii extends Room {
 		setInterval(() => {
 			this.gametick()
 		}, 1500);
+
+		this.customerMaxId = 0;
 	}
 
 	onCreate(options: any) {
@@ -286,12 +286,14 @@ export class Ascii extends Room {
 		}
 		var random: number = Math.floor(Math.random() * 20); // numbers between 0 and 10
 		if (random >= 13) {
-			var order_items: string[] = ["Kolle", "Zotrine", "Premium", "Empty_Coffee_Cup", "Kolle_Pfand", "Zotrine_Pfand", "Premium_Pfand"]
+			//var order_items: string[] = ["Kolle", "Zotrine", "Premium", "Empty_Coffee_Cup", "Kolle_Pfand", "Zotrine_Pfand", "Premium_Pfand"]
+			var order_items: string[] = ["Kolle", "Zotrine", "Premium"]
+
 			var order_item: string = ''
 			var i: number;
 			let wants = new MapSchema<number>();
 			var amount: number = Math.floor(Math.random() * 3) + 1; // numbers between 1 and 4
-			for (i = 1; i <= amount; i++) {
+			for (i = 1; i <= 1; i++) {
 
 				var random: number = Math.floor(Math.random() * order_items.length); // numbers between 0 and 3
 				order_item = order_items[random]
@@ -302,7 +304,9 @@ export class Ascii extends Room {
 					wants[order_item] = 1
 				}
 			}
-			this.state.createCustomer(wants)
+			this.customerMaxId = this.customerMaxId +1;
+
+			this.state.createCustomer(wants, this.customerMaxId)
 		}
 	}
 }
