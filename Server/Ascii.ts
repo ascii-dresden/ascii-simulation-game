@@ -25,8 +25,7 @@ class Customer extends Schema {
 		else{
 			this.hasPaid = true
 		}*/
-	}
-	
+	}	
 }
 
 //state of the game in the current room
@@ -193,6 +192,14 @@ export class Ascii extends Room {
 		}		
 	}
 		
+	//checks collision with any player
+	playerCollision(x:number, y:number) {
+		for (let id of Object.keys(this.state.players)){
+			if (this.state.players[id].x == x &&
+				this.state.players[id].y == y) { return true; }
+		}	
+		return false;
+	}
 	//move messages say the client tried to walk 1 space to given direction
 	//collision check at server, update position AND rotation
 	onMove (client: Client, data : any) {
@@ -207,6 +214,7 @@ export class Ascii extends Room {
 		//collision check
 		if (x < 0 || y < 0 || x>9 || y>7) { return; }
 		if (hitbox.has(x*10+y)) { return; }
+		if (this.playerCollision(x,y)) { return; }
 		//actually moving the player
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
