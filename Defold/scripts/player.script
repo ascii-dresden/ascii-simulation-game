@@ -5,6 +5,8 @@ local game_controller = "default:/main#game_controller"
 function init(self)                                 -- [1]
 	msg.post(".", "acquire_input_focus")
 	origRotation = go.get_rotation();
+	self.has_inventory = false
+	self.direction = 'down'
 end
 
 function final(self)                                -- [7]
@@ -13,25 +15,25 @@ end
 
 function on_input(self, action_id, action)
 	-- send move msg to server
+	new_direction = false
 	if action.pressed then
 		if action_id == hash("up") then 
-			msg.post(game_controller, "move", {dir = "up"});
-			sprite.play_flipbook("#sprite",hash("Player_Up"))
+			new_direction = "up"
 		elseif action_id == hash("down") then
-			msg.post(game_controller, "move", {dir = "down"});
-			sprite.play_flipbook("#sprite",hash("Player_Down"))
+			new_direction = "down"
 		elseif action_id == hash("right") then
-			msg.post(game_controller, "move", {dir = "right"});
-			sprite.play_flipbook("#sprite",hash("Player_Right"))
+			new_direction = "right"
 		elseif action_id == hash("left") then
-			msg.post(game_controller, "move", {dir = "left"});
-			sprite.play_flipbook("#sprite",hash("Player_Left"))
+			new_direction = "left"
 		elseif action_id == hash("drop") then
 			msg.post(game_controller, "drop");
 		elseif action_id == hash("use") then
 			msg.post(game_controller, "use");
 		elseif action_id == hash("refill") then --just for testing
 			msg.post(game_controller, "refill", {item = "all"});
+		end
+		if new_direction then
+			msg.post(game_controller, "move", {dir = new_direction});
 		end
 	end
 end
@@ -49,8 +51,15 @@ function on_message(self, message_id, message, sender)
 		go.set_position(position);
 		--go.set_rotation(origRotation * vmath.quat_rotation_z(math.rad(message.rot)))
 	end
-	if message.inventory then
-		draw_inventory(message.inventory)
-	end	
+
+	if not (message.inventory == "Empty") then
+		sprite.play_flipbook("#sprite",hash("Player_" .. message.rot .. "_Hold"))
+	else
+		sprite.play_flipbook("#sprite",hash("Player_" .. message.rot))
+	end
+
+	draw_inventory(message.inventory)
+	
+	
 end
 

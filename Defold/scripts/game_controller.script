@@ -3,7 +3,7 @@ local id
 -- SERVER VARS
 local server_adress = "localhost"
 local server_port = "2567"
-local debug = true
+local debug = true;
 
 --VARS
 local client
@@ -16,7 +16,7 @@ local customers = {}
 
 function drawCustomers(change)
 	if table.maxn(room.state.customers) > table.maxn(customers) then
-		created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,0.1), vmath.quat(),{},1)
+		created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,0.1), vmath.quat(),{},3.125)
 		customers[table.maxn(customers) +1] = created_id
 	elseif table.maxn(room.state.customers) < table.maxn(customers) then
 		go.delete(customers[table.maxn(customers)])
@@ -56,7 +56,7 @@ function Move(change)
 	if room.state.players and room.state.players[id] then
 		newx = room.state.players[id].x*scaling + spriteCenter;
 		newy = room.state.players[id].y*scaling + spriteCenter;
-		newrot = room.state.players[id].rotation * -90;
+		newrot = room.state.players[id].rotation;
 		newinv = room.state.players[id].inventory
 		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot, inventory = newinv});
 
@@ -72,7 +72,7 @@ function Move(change)
 			elseif other_players[other_id] and other_id ~= id then
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
-				newrot = room.state.players[other_id].rotation * -90;
+				newrot = room.state.players[other_id].rotation;
 				-- go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
 				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot});
 
@@ -92,7 +92,7 @@ function init(self)
 	if debug then
 		client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port,false)
 	else
-		server_adress = "asciigame.pvc.ifsr.de/api"
+		server_adress = "game.ascii.coffee/api"
 		client = ColyseusClient.new("wss://" .. server_adress,false)
 	end
 	client:join_or_create("Ascii", {}, function(err, room_instance)

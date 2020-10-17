@@ -16,9 +16,45 @@ animations {
   flip_vertical: 0
 }
 animations {
+  id: "Coffee_Empty"
+  start_tile: 35
+  end_tile: 35
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Coffee_Full"
+  start_tile: 15
+  end_tile: 15
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
   id: "Crema_Beans"
   start_tile: 28
   end_tile: 28
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Customer_1"
+  start_tile: 9
+  end_tile: 9
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Customer_2"
+  start_tile: 19
+  end_tile: 19
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0
@@ -46,6 +82,15 @@ animations {
   id: "Espresso_Beans"
   start_tile: 27
   end_tile: 27
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Kasse"
+  start_tile: 42
+  end_tile: 42
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0
@@ -88,18 +133,36 @@ animations {
   flip_vertical: 0
 }
 animations {
-  id: "Player_Down"
-  start_tile: 9
-  end_tile: 9
+  id: "Milk_Empty"
+  start_tile: 25
+  end_tile: 25
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0
   flip_vertical: 0
 }
 animations {
-  id: "Player_Left"
-  start_tile: 19
-  end_tile: 19
+  id: "Milk_Full"
+  start_tile: 5
+  end_tile: 5
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Money"
+  start_tile: 77
+  end_tile: 77
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "PHP_Cup"
+  start_tile: 67
+  end_tile: 67
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0

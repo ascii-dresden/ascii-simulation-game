@@ -14,26 +14,6 @@ components {
   }
 }
 embedded_components {
-  id: "sprite"
-  type: "sprite"
-  data: "tile_set: \"/map.tilesource\"\n"
-  "default_animation: \"Kolle\"\n"
-  "material: \"/builtins/materials/sprite.material\"\n"
-  "blend_mode: BLEND_MODE_ALPHA\n"
-  ""
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-}
-embedded_components {
   id: "label"
   type: "label"
   data: "size {\n"
@@ -49,9 +29,9 @@ embedded_components {
   "  w: 0.0\n"
   "}\n"
   "color {\n"
-  "  x: 0.9019608\n"
-  "  y: 0.9019608\n"
-  "  z: 0.9019608\n"
+  "  x: 1.0\n"
+  "  y: 1.0\n"
+  "  z: 1.0\n"
   "  w: 1.0\n"
   "}\n"
   "outline {\n"
@@ -76,8 +56,8 @@ embedded_components {
   "material: \"/builtins/fonts/label.material\"\n"
   ""
   position {
-    x: 10.0
-    y: -20.0
+    x: 60.0
+    y: 20.0
     z: 0.1
   }
   rotation {
