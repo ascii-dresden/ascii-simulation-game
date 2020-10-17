@@ -14,17 +14,11 @@ class Player extends Schema {
 
 class Customer extends Schema {
 	@type({ map: "number" }) wants = new MapSchema<number>();
-	@type("boolean") hasPaid : boolean = true;
+	@type("boolean") hasPaid : boolean = false;
 
-	constructor(wants:MapSchema<number>,/* hasPaid?:boolean*/){
+	constructor(wants:MapSchema<number>,){
 		super();
 		this.wants = wants;
-		/*if(hasPaid){
-			this.hasPaid = hasPaid
-		}
-		else{
-			this.hasPaid = true
-		}*/
 	}	
 }
 
@@ -107,6 +101,7 @@ export class Ascii extends Room {
 		this.state.players[client.sessionId].inventory = data;
 	}
 
+	//item (desire) gets send out to the customer, assumes customer wants the item
 	CustomerReceive(pos: number, desire : string) {
 		let customer = this.state.customers[pos];
 		this.state.customers[pos].wants[desire]--;
@@ -114,21 +109,36 @@ export class Ascii extends Room {
 			delete this.state.customers[pos].wants[desire];
 		}
 		if (Object.keys(customer.wants).length != 0) { return; }
-		if (!customer.hasPaid) { return; }
+		if (!customer.hasPaid) { 
+			this.state.customers[pos].wants["Money"] = 1;
+			this.state.customers[pos].hasPaid = true;
+			return;
+		}
 		this.state.customers.splice(pos,1);
-		this.state.score = this.state.score + 10;
 	}
 
+	//customer gets angry when served PHP
+	CustomerAngry(pos: number) {
+		this.state.customers.splice(pos,1)
+		this.state.score = this.state.score - 50;
+	}
+	
 	//serving stuff to customers
 	Serve(client: Client, pos: number) {
-		let inv = this.state.players[client.sessionId].inventory;
+		//is there a customer at this counter
 		if (this.state.customers.length <= pos) {
+			return;
+		}
+		let inv = this.state.players[client.sessionId].inventory;
+		if (inv == "PHP_Cup") { 
+			this.CustomerAngry(pos);
+			this.state.players[client.sessionId].inventory = "Empty";
 			return;
 		}
 		//customer wants beverage
 		for (let desire of (Object.keys(this.state.customers[pos].wants))) {
 			//returning empty stuff
-			if (desire.startsWith("Empty") || desire.endsWith("_Pfand")) {
+			if (desire.startsWith("Empty") || desire.endsWith("_Pfand") || desire == "Money") {
 				if (this.state.players[client.sessionId].inventory != "Empty") {
 					continue;
 				}
@@ -164,11 +174,15 @@ export class Ascii extends Room {
 			this.Refill(client,"Espresso_Beans");
 		}	
 	}
+	
 	//returning empty bottles
 	Return(client: Client, data: string) {
 		let wanted = data + "_Pfand";
 		if (data == "sink") {
 			wanted = "Empty_Coffee_Cup";
+		}
+		if (data == "register") {
+			wanted = "Money";
 		}
 		if (this.state.players[client.sessionId].inventory != wanted) {
 			return;
@@ -196,7 +210,8 @@ export class Ascii extends Room {
 				this.Return(client,boxname[1]);
 				break;
 			case "sink":
-				this.Return(client, "sink");
+			case "register":
+				this.Return(client, boxname[0]);
 				break;
 			case "trash":
 				this.state.players[client.sessionId].inventory = "Empty";
