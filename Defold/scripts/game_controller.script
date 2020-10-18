@@ -32,16 +32,13 @@ function drawCustomers(change)
 
 
 	for pos, customer in pairs(room.state.customers) do
-		print(pos, customer.id)
-	end	
-	
-	for pos, customer in pairs(room.state.customers) do
-		
+
+		-- called out of order
 		if not setContains(customers, customer.id) then
 			-- create new customer if not yet created
 			created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,0.1), vmath.quat(),{},3.125)
 			customers[customer.id] = created_id
-			print('created customer id:' ..customer.id)
+			customer_go = customers[customer.id]
 			msg.post(customer_go, "Game State", {sprite_id = customer.sprite_id})
 			
 
@@ -58,7 +55,7 @@ function drawCustomers(change)
 	for customer_id, customer_go in pairs(customers) do
 		if not gamestateHasCustomer(customer_id) then
 			go.delete(customers[customer_id])
-			table.remove(customers, customer_id)
+			customers[customer_id] = nil;
 		end
 	end
 end
@@ -146,9 +143,5 @@ function on_message(self, message_id, message, sender)
 		room:send("move",message.dir);
 	elseif (message_id == hash("use")) then
 		room:send("use")
-	elseif (message_id == hash("drop")) then
-		room:send("drop");
-	elseif (message_id == hash("refill")) then
-		room:send("refill",message.item);
 	end
 end

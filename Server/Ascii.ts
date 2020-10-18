@@ -115,9 +115,6 @@ export class Ascii extends Room {
 		}
 		if (Object.keys(customer.wants).length != 0) { return; }
 		this.state.customers.splice(pos,1);
-		for (let cust of (this.state.customers)) {
-			console.log(cust.id)
-		}
 		this.state.score = this.state.score + 10;
 	}
 
