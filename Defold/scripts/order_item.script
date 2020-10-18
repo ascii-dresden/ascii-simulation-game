@@ -7,7 +7,11 @@ function on_message(self, message_id, message, sender)
 		--sprite.play_flipbook("#sprite",hash(message.item))
 	end
 	if message.amount then
-		label.set_text("#label", message.amount .. "x " .. message.item)
+		if (message.amount == 0) then 
+			label.set_text("#label", "")
+		else
+			label.set_text("#label", message.amount .. "x " .. message.item)
+		end
 	end
 		
 	if message.x then
