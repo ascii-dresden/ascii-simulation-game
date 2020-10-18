@@ -97,7 +97,18 @@ function init(self)
 		server_adress = "game.ascii.coffee/api"
 		client = ColyseusClient.new("wss://" .. server_adress,false)
 	end
-	client:join_or_create("Ascii", {}, function(err, room_instance)
+
+	join()
+
+end
+
+function update(self, dt)
+	client:loop()
+end
+
+function join(room_id)
+	if room_id ~= nil then
+	client:join_or_create("Ascii".. room_id, {}, function(err, room_instance)
 		if err then
 			print("ERROR JOINING ROOM")
 			pprint(err)
@@ -115,12 +126,14 @@ function init(self)
 
 end
 
-function update(self, dt)
-	client:loop()
 end
 
 function on_message(self, message_id, message, sender)
 	--no messages can be sent before the client is ready
+	if message.room_id ~= nil then
+		join(message.room_id)
+	end
+
 	if (not id) then
 		return
 	end
@@ -133,4 +146,5 @@ function on_message(self, message_id, message, sender)
 	elseif (message_id == hash("refill")) then
 		room:send("refill",message.item);
 	end
+	
 end

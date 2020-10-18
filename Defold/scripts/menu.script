@@ -1,3 +1,6 @@
+local game_controller = "default:/main#game_controller"
+
+
 function init(self)
 	-- Add initialization code here
 	-- Learn more: https://defold.com/manuals/script/
@@ -46,14 +49,28 @@ function on_input(self, action_id, action)
 				menu('enable')
 				self.show = true
 			end
+			
 		end
+
+		if self.show then
+		if action_id == hash("1") then 
+			msg.post(game_controller, "room_id", {room_id = '1'});
+			
+		elseif action_id == hash("2") then 
+			msg.post(game_controller, "room_id", {room_id = '2'});
+			
+		elseif action_id == hash("3") then 
+			msg.post(game_controller, "room_id", {room_id = '3'});
+			
+		end
+	end
 	end
 	
 end
 
 function menu(mode)
 	-- mode enable or disable
-	local menu_objects = {'cappucchino', 'coffee', 'customers', 'cashier', 'sink', 'trash', 'kolle', 'premium', 'zotrine', 'empty', 'refill'}
+	local menu_objects = {'cappucchino', 'coffee', 'customers', 'cashier', 'sink', 'trash', 'kolle', 'premium', 'zotrine', 'empty', 'refill', 'controls'}
 	for k,v in pairs(menu_objects) do
 		msg.post("#" .. v, mode) --visible = false
 	end
