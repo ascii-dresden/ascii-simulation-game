@@ -7,7 +7,16 @@ collision: ""
 material_tag: "tile"
 collision_groups: "default"
 animations {
-  id: "Coffee_Cup"
+  id: "Cappucchino"
+  start_tile: 8
+  end_tile: 8
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Coffee"
   start_tile: 17
   end_tile: 17
   playback: PLAYBACK_LOOP_FORWARD
@@ -118,15 +127,6 @@ animations {
   id: "Milk"
   start_tile: 7
   end_tile: 7
-  playback: PLAYBACK_LOOP_FORWARD
-  fps: 1
-  flip_horizontal: 0
-  flip_vertical: 0
-}
-animations {
-  id: "Milk_Coffee_Cup"
-  start_tile: 8
-  end_tile: 8
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0
