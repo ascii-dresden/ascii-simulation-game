@@ -44,10 +44,8 @@ function on_input(self, action_id, action)
 			
 			if self.show then
 				menu('disable')
-				self.show = false
 			else
 				menu('enable')
-				self.show = true
 			end
 			
 		end
@@ -55,12 +53,15 @@ function on_input(self, action_id, action)
 		if self.show then
 		if action_id == hash("1") then 
 			msg.post(game_controller, "room_id", {room_id = '1'});
+			menu('disable')
 			
 		elseif action_id == hash("2") then 
 			msg.post(game_controller, "room_id", {room_id = '2'});
+			menu('disable')
 			
 		elseif action_id == hash("3") then 
 			msg.post(game_controller, "room_id", {room_id = '3'});
+			menu('disable')
 			
 		end
 	end
@@ -74,6 +75,7 @@ function menu(mode)
 	for k,v in pairs(menu_objects) do
 		msg.post("#" .. v, mode) --visible = false
 	end
+	self.show = mode == 'enable'
 end
 
 function on_reload(self)
