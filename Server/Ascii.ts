@@ -10,11 +10,12 @@ class Player extends Schema {
 	@type("number") y : number = 1;
 	@type("string") inventory : string = "Empty";
 	@type("string") rotation : string = "down";
+	@type("number") money_carried : number = 0;
 }
 
 class Customer extends Schema {
 	@type({ map: "number" }) wants = new MapSchema<number>();
-	@type("boolean") hasPaid : boolean = false;
+	@type("number") pays : number = 0;
 
 	constructor(wants:MapSchema<number>,){
 		super();
@@ -109,9 +110,8 @@ export class Ascii extends Room {
 			delete this.state.customers[pos].wants[desire];
 		}
 		if (Object.keys(customer.wants).length != 0) { return; }
-		if (!customer.hasPaid) { 
+		if (customer.pays != 0) { 
 			this.state.customers[pos].wants["Money"] = 1;
-			this.state.customers[pos].hasPaid = true;
 			return;
 		}
 		this.state.customers.splice(pos,1);
@@ -135,7 +135,6 @@ export class Ascii extends Room {
 			this.state.players[client.sessionId].inventory = "Empty";
 			return;
 		}
-		//customer wants beverage
 		for (let desire of (Object.keys(this.state.customers[pos].wants))) {
 			//returning empty stuff
 			if (desire.startsWith("Empty") || desire.endsWith("_Pfand") || desire == "Money") {
@@ -143,13 +142,20 @@ export class Ascii extends Room {
 					continue;
 				}
 				this.state.players[client.sessionId].inventory = desire;
-			} else {
+				//transfers correct ammount of money to player
+				if (desire == "Money") {
+					this.state.players[client.sessionId].money_carried = this.state.customers[pos].pays;
+					this.state.customers[pos].pays = 0;
+				}
+			} else {	//buying new stuff
 				if (this.state.players[client.sessionId].inventory != desire) {
 					continue;
 				}
 				this.state.players[client.sessionId].inventory = "Empty";
+				this.state.customers[pos].pays = this.state.customers[pos].pays + 10;
 			}
 			this.CustomerReceive(pos,desire);
+			break;
 		}
 	}
 	
@@ -181,16 +187,19 @@ export class Ascii extends Room {
 		if (data == "sink") {
 			wanted = "Empty_Coffee_Cup";
 		}
-		if (data == "register") {
-			wanted = "Money";
-		}
 		if (this.state.players[client.sessionId].inventory != wanted) {
 			return;
 		}
 		this.state.players[client.sessionId].inventory = "Empty";
 		this.state.score = this.state.score + 10;
 	}
-
+	
+	Register(client: Client) {
+		if (this.state.players[client.sessionId].inventory != "Money") { return; }
+		this.state.players[client.sessionId].inventory = "Empty";
+		this.state.score = this.state.score + this.state.players[client.sessionId].money_carried;
+		this.state.players[client.sessionId].money_carried;
+	}
 	//Message Handlers	
 	//delegates the "use" command to the action that is relevant for current position
 	onUse(client: Client, data: any) {
@@ -210,8 +219,10 @@ export class Ascii extends Room {
 				this.Return(client,boxname[1]);
 				break;
 			case "sink":
+				this.Return(client, "sink");
+				break;
 			case "register":
-				this.Return(client, boxname[0]);
+				this.Register(client);
 				break;
 			case "trash":
 				this.state.players[client.sessionId].inventory = "Empty";
