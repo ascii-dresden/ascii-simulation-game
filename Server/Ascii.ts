@@ -24,11 +24,17 @@ class Player extends Schema {
 class Customer extends Schema {
 	@type({ map: "number" }) wants = new MapSchema<number>();
 	@type("number") pays : number = 0;
+	@type("boolean") waiting : boolean = true;
+	@type("number") id : number;
+	@type("number") sprite_id : number;
 
-	constructor(wants:MapSchema<number>,){
+	constructor(wants:MapSchema<number>, id:number){
 		super();
 		this.wants = wants;
-	}	
+		this.id = id;
+		this.sprite_id = Math.floor(Math.random() * 1.99) + 1; // numbers between 1 and 2
+
+	}
 }
 
 //state of the game in the current room
@@ -39,11 +45,11 @@ class State extends Schema {
 	//function to create a new player for given id  
 	createPlayer (id: string) { this.players[ id ] = new Player(Object.keys(this.players).length); }
 	@type([Customer]) customers = new ArraySchema<Customer>();
-	createCustomer (wants: MapSchema<number>) { this.customers.push(new Customer(wants)); }
+	createCustomer (wants: MapSchema<number>, id: number) { this.customers.push(new Customer(wants, id)); }
 }
 
 export class Ascii extends Room {
-
+	customerMaxId = 0;
 	//single Tick of the Timer
 	gametick() {
 		this.generateCustomer();
@@ -305,6 +311,8 @@ export class Ascii extends Room {
 		setInterval(() => {
 			this.gametick()
 		}, 1500);
+
+		this.customerMaxId = 0;
 	}
 
 	onJoin(client: Client, options: any) {
@@ -341,7 +349,9 @@ export class Ascii extends Room {
 					wants[order_item] = 1
 				}
 			}
-			this.state.createCustomer(wants)
+			this.customerMaxId = this.customerMaxId +1;
+
+			this.state.createCustomer(wants, this.customerMaxId)
 		}
 	}
 }
