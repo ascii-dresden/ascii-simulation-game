@@ -206,13 +206,32 @@ export class Ascii extends Room {
 		this.state.score = this.state.score + this.state.players[client.sessionId].money_carried;
 		this.state.players[client.sessionId].money_carried;
 	}
+	
+	//tries to hand item to player on coords
+	HandItem(client : Client, x : number, y : number) {
+		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
+		let otherPlayer = "";
+		for (let player of Object.keys(this.state.players)) {
+			if ((this.state.players[player].x == x) && (this.state.players[player].y == y)) {
+				otherPlayer = player;
+				break;
+			}
+		}
+		if (otherPlayer == "") { return; }
+		if (this.state.players[otherPlayer].inventory != "Empty") { return; }
+		this.state.players[otherPlayer].inventory = this.state.players[client.sessionId].inventory;
+		this.state.players[client.sessionId].inventory = "Empty";
+	}
 	//Message Handlers	
 	//delegates the "use" command to the action that is relevant for current position
 	onUse(client: Client, data: any) {
 		let player = this.state.players[client.sessionId];
 		let pos = this.direction(player.rotation,player.x,player.y); 
 		let position = pos[0]*10+pos[1];
-		if (! hitbox.has(position)) {return;}
+		if (! hitbox.has(position)) {
+			this.HandItem(client,pos[0],pos[1]);
+			return;
+		}
 		let boxname = hitbox.get(position).split(" ");
 		switch(boxname[0]) {
 			case "counter":
