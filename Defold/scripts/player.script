@@ -2,6 +2,13 @@ local origRotation
 
 local game_controller = "default:/main#game_controller"
 
+go.property("green", resource.tile_source("/player_green.tilesource"))
+go.property("blue", resource.tile_source("/player_blue.tilesource"))
+go.property("violett", resource.tile_source("/player_violett.tilesource"))
+go.property("red", resource.tile_source("/player_red.tilesource"))
+go.property("petrol", resource.tile_source("/player_petrol.tilesource"))
+go.property("orange", resource.tile_source("/player_orange.tilesource"))
+
 function init(self)                                 -- [1]
 	msg.post(".", "acquire_input_focus")
 	origRotation = go.get_rotation();
@@ -60,6 +67,18 @@ function on_message(self, message_id, message, sender)
 
 	draw_inventory(message.inventory)
 	
-	
+	if message.color == 0 then
+		go.set("#sprite", "image", self.green)
+	elseif message.color == 1 then
+		go.set("#sprite", "image", self.blue)
+	elseif message.color == 2 then
+		go.set("#sprite", "image", self.red)
+	elseif message.color == 3 then
+		go.set("#sprite", "image", self.petrol)
+	elseif message.color == 4 then
+		go.set("#sprite", "image", self.violett)
+	elseif message.color == 5 then
+		go.set("#sprite", "image", self.orange)
+	end
 end
 

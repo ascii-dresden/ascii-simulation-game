@@ -5,12 +5,20 @@ import { type, Schema, MapSchema, ArraySchema } from '@colyseus/schema';
 var max = new Map([["Crema_Beans",5],["Espresso_Beans",5],["Milk",6]]);
 
 //a single player
+
+
+
 class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
 	@type("number") y : number = 1;
 	@type("string") inventory : string = "Empty";
 	@type("string") rotation : string = "down";
 	@type("number") money_carried : number = 0;
+	@type("number") sprite : number;
+	constructor(length:number,){
+		super();
+		this.sprite = length % 6;
+	}
 }
 
 class Customer extends Schema {
@@ -29,7 +37,7 @@ class State extends Schema {
 	@type({ map: "number" }) Resources = new MapSchema<number>();
 	@type("number") score = 0;
 	//function to create a new player for given id  
-	createPlayer (id: string) { this.players[ id ] = new Player(); }
+	createPlayer (id: string) { this.players[ id ] = new Player(Object.keys(this.players).length); }
 	@type([Customer]) customers = new ArraySchema<Customer>();
 	createCustomer (wants: MapSchema<number>) { this.customers.push(new Customer(wants)); }
 }

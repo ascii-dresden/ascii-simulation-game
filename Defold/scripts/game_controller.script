@@ -58,23 +58,24 @@ function Move(change)
 		newy = room.state.players[id].y*scaling + spriteCenter;
 		newrot = room.state.players[id].rotation;
 		newinv = room.state.players[id].inventory
-		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot, inventory = newinv});
+		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot, inventory = newinv, color= room.state.players[id].sprite});
 
 		for other_id,value in pairs(room.state.players) do
 			if other_id ~= id and room.state.players[other_id].x and not other_players[other_id] then 
-				print(other_id, room.state.players[other_id])
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
 
-				created_id = factory.create("default:/other_player_factory#factory", vmath.vector3(newx, newy, 1),vmath.quat(),{},1)
+				created_id = factory.create("default:/other_player_factory#factory", vmath.vector3(newx, newy, 1),vmath.quat(),{},3.125)
 				other_players[other_id] = created_id
 
 			elseif other_players[other_id] and other_id ~= id then
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
 				newrot = room.state.players[other_id].rotation;
+				newinv = room.state.players[other_id].inventory
+				
 				-- go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
-				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot});
+				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot, inventory = newinv, color= room.state.players[other_id].sprite});
 
 			end
 		end

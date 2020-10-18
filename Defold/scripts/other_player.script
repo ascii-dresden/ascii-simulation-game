@@ -1,6 +1,16 @@
 local origRotation
-function init(self)
+go.property("green", resource.tile_source("/player_green.tilesource"))
+go.property("blue", resource.tile_source("/player_blue.tilesource"))
+go.property("violett", resource.tile_source("/player_violett.tilesource"))
+go.property("red", resource.tile_source("/player_red.tilesource"))
+go.property("petrol", resource.tile_source("/player_petrol.tilesource"))
+go.property("orange", resource.tile_source("/player_orange.tilesource"))
+
+
+function init(self, color)
 	origRotation = go.get_rotation();
+	
+	
 end
 
 function final(self)
@@ -15,12 +25,43 @@ function update(self, dt)
 	-- Remove this function if not needed
 end
 
+function draw_inventory(inventory)
+	msg.post("#item", "play_animation", { id = hash(inventory) });
+	--item.play_flipbook("#item", hash(inventory))
+end
+
 function on_message(self, message_id, message, sender)
+
+	
+
+	
 	local position = go.get_position();
 	position.x = message.x;
 	position.y = message.y;
 	go.set_position(position);
-	go.set_rotation(origRotation * vmath.quat_rotation_z(math.rad(message.rot)));
+
+	if message.inventory then
+		if not (message.inventory == "Empty") then
+			sprite.play_flipbook("#sprite",hash("Player_" .. message.rot .. "_Hold"))
+		else
+			sprite.play_flipbook("#sprite",hash("Player_" .. message.rot))
+		end
+	draw_inventory(message.inventory)
+
+	if message.color == 0 then
+		go.set("#sprite", "image", self.green)
+	elseif message.color == 1 then
+		go.set("#sprite", "image", self.blue)
+	elseif message.color == 2 then
+		go.set("#sprite", "image", self.red)
+	elseif message.color == 3 then
+		go.set("#sprite", "image", self.petrol)
+	elseif message.color == 4 then
+		go.set("#sprite", "image", self.violett)
+	elseif message.color == 5 then
+		go.set("#sprite", "image", self.orange)
+	end
+end
 end
 
 function on_input(self, action_id, action)

@@ -178,8 +178,8 @@ embedded_instances {
     w: 1.0
   }
   scale3 {
-    x: 0.5
-    y: 0.5
+    x: 3.125
+    y: 3.125
     z: 1.0
   }
 }
@@ -1005,6 +1005,26 @@ embedded_instances {
   "    x: 150.0\n"
   "    y: 550.0\n"
   "    z: 0.1\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"bg\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"tile_set: \\\"/background_menu.atlas\\\"\\n"
+  "default_animation: \\\"background_menu_png\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "blend_mode: BLEND_MODE_ALPHA\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 500.0\n"
+  "    y: 400.0\n"
+  "    z: 0.9\n"
   "  }\n"
   "  rotation {\n"
   "    x: 0.0\n"
