@@ -205,6 +205,15 @@ animations {
   flip_vertical: 0
 }
 animations {
+  id: "Speechbuble"
+  start_tile: 52
+  end_tile: 52
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
   id: "Zotrine"
   start_tile: 47
   end_tile: 47
