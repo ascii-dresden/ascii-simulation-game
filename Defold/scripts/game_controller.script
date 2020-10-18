@@ -60,6 +60,14 @@ function drawCustomers(change)
 	end
 end
 
+function drawScore(change)
+	for k, v in pairs(change) do
+		if v['field'] == 'score' then
+			msg.post('/score', 'score', {score = v['value']})
+		end
+	end
+end
+
 -- maybe seperate server-client communication and object controller
 -- positions of interactable objects 
 local fullKolle   = {x = 8, y = 4, rotation = 1}
@@ -73,25 +81,29 @@ function Move(change)
 		newy = room.state.players[id].y*scaling + spriteCenter;
 		newrot = room.state.players[id].rotation;
 		newinv = room.state.players[id].inventory
-		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot, inventory = newinv});
+		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot, inventory = newinv, color= room.state.players[id].sprite});
 
 		for other_id,value in pairs(room.state.players) do
 			if other_id ~= id and room.state.players[other_id].x and not other_players[other_id] then 
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
 
-				created_id = factory.create("default:/other_player_factory#factory", vmath.vector3(newx, newy, 1),vmath.quat(),{},1)
+				created_id = factory.create("default:/other_player_factory#factory", vmath.vector3(newx, newy, 0.1),vmath.quat(),{},3.125)
 				other_players[other_id] = created_id
 
 			elseif other_players[other_id] and other_id ~= id then
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
-				newrot = room.state.players[other_id].rotation ;
-				go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
-				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot});
+				newrot = room.state.players[other_id].rotation;
+				newinv = room.state.players[other_id].inventory
+				
+				-- go.set_position(vmath.vector3(newx, newy, 1), other_players[other_id])
+				msg.post(other_players[other_id], "Game State", {x = newx, y = newy , rot = newrot, inventory = newinv, color= room.state.players[other_id].sprite});
 
 			end
 		end
+		drawCustomers(change)
+		drawScore(change)
 	end
 end
 
@@ -106,13 +118,26 @@ end
 
 
 function init(self)
+
+	
 	if debug then
 		client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port,false)
 	else
 		server_adress = "game.ascii.coffee/api"
 		client = ColyseusClient.new("wss://" .. server_adress,false)
 	end
-	client:join_or_create("Ascii", {}, function(err, room_instance)
+
+	join()
+
+end
+
+function update(self, dt)
+	client:loop()
+end
+
+function join(room_id)
+	if room_id ~= nil then
+	client:join_or_create("Ascii".. room_id, {}, function(err, room_instance)
 		if err then
 			print("ERROR JOINING ROOM")
 			pprint(err)
@@ -130,12 +155,14 @@ function init(self)
 
 end
 
-function update(self, dt)
-	client:loop()
 end
 
 function on_message(self, message_id, message, sender)
 	--no messages can be sent before the client is ready
+	if message.room_id ~= nil then
+		join(message.room_id)
+	end
+
 	if (not id) then
 		return
 	end
@@ -144,4 +171,5 @@ function on_message(self, message_id, message, sender)
 	elseif (message_id == hash("use")) then
 		room:send("use")
 	end
+	
 end

@@ -3,10 +3,6 @@ key_trigger {
   action: "use"
 }
 key_trigger {
-  input: KEY_D
-  action: "drop"
-}
-key_trigger {
   input: KEY_UP
   action: "up"
 }
@@ -23,8 +19,20 @@ key_trigger {
   action: "right"
 }
 key_trigger {
-  input: KEY_R
-  action: "refill"
+  input: KEY_TAB
+  action: "menu"
+}
+key_trigger {
+  input: KEY_1
+  action: "1"
+}
+key_trigger {
+  input: KEY_2
+  action: "2"
+}
+key_trigger {
+  input: KEY_3
+  action: "3"
 }
 mouse_trigger {
   input: MOUSE_BUTTON_1

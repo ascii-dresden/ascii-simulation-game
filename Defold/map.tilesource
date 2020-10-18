@@ -152,8 +152,8 @@ animations {
 }
 animations {
   id: "Money"
-  start_tile: 77
-  end_tile: 77
+  start_tile: 68
+  end_tile: 68
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0
@@ -199,6 +199,15 @@ animations {
   id: "Premium_Pfand"
   start_tile: 58
   end_tile: 58
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Speechbuble"
+  start_tile: 52
+  end_tile: 52
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0

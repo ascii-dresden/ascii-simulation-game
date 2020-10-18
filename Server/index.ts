@@ -19,7 +19,10 @@ const gameServer = new Server({
 });
 
 // register your room handlers
-gameServer.define('Ascii', Ascii);
+gameServer.define('Ascii1', Ascii);
+gameServer.define('Ascii2', Ascii);
+gameServer.define('Ascii3', Ascii);
+
 
 /**
  * Register @colyseus/social routes
