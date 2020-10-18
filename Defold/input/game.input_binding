@@ -3,10 +3,6 @@ key_trigger {
   action: "use"
 }
 key_trigger {
-  input: KEY_D
-  action: "drop"
-}
-key_trigger {
   input: KEY_UP
   action: "up"
 }
@@ -21,10 +17,6 @@ key_trigger {
 key_trigger {
   input: KEY_RIGHT
   action: "right"
-}
-key_trigger {
-  input: KEY_R
-  action: "refill"
 }
 key_trigger {
   input: KEY_TAB
