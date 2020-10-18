@@ -26,6 +26,10 @@ key_trigger {
   input: KEY_R
   action: "refill"
 }
+key_trigger {
+  input: KEY_TAB
+  action: "menu"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_1
   action: "touch"

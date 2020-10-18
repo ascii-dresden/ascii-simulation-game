@@ -89,6 +89,8 @@ end
 
 
 function init(self)
+
+	
 	if debug then
 		client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port,false)
 	else
