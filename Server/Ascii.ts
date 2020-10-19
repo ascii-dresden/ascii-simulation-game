@@ -4,9 +4,6 @@ import { type, Schema, MapSchema, ArraySchema } from '@colyseus/schema';
 
 var max = new Map([["Crema_Beans",5],["Espresso_Beans",5],["Milk",6]]);
 
-//a single player
-
-
 
 class Player extends Schema {
 	@type("number") x : number = 2;	//players start behind the counter
@@ -42,7 +39,9 @@ class State extends Schema {
 	@type({ map: Player }) players = new MapSchema<Player>();
 	@type({ map: "number" }) Resources = new MapSchema<number>();
 	@type("number") score = 0;
-	//function to create a new player for given id  
+	@type("number") time = 300;
+	@type("boolean") paused = true;
+	//function to create a new player for given id
 	createPlayer (id: string) { this.players[ id ] = new Player(Object.keys(this.players).length); }
 	@type([Customer]) customers = new ArraySchema<Customer>();
 	createCustomer (wants: MapSchema<number>, id: number) { this.customers.push(new Customer(wants, id)); }
@@ -50,9 +49,15 @@ class State extends Schema {
 
 export class Ascii extends Room {
 	customerMaxId = 0;
+	gametimer = setTimeout(()=>{},10);
+	tutor = "";
 	//single Tick of the Timer
 	gametick() {
 		this.generateCustomer();
+		this.state.time--;
+		if (state.time == 0) {
+			this.pause();
+		}
 	}
 
 	direction(data: string, x: number, y: number) {
@@ -82,10 +87,10 @@ export class Ascii extends Room {
 	//returns false if not enough Resources were available
 	consume(Product: string) {
 		let requirement = new Map();
-		if (Product == "Coffee_Cup") { 
+		if (Product == "Coffee") { 
 			requirement.set("Crema_Beans",1);
 		}
-		else if (Product == "Milk_Coffee_Cup") {
+		else if (Product == "Cappucchino") {
 			requirement.set("Espresso_Beans",1);
 			requirement.set("Milk",2);
 		}
@@ -183,13 +188,14 @@ export class Ascii extends Room {
 	
 	//this can be either getting coffee, or refilling, and handles both sides of the machine
 	Machine(client: Client, side : string) {
+		console.log(side);
 		//both Produce and Refill methods check if the player has the valid inventory state
 		if (side == "milk") {
-			this.Produce(client,"Milk_Coffee_Cup");
+			this.Produce(client,"Cappucchino");
 			this.Refill(client,"Milk");
 		}
 		else {
-			this.Produce(client,"Coffee_Cup");
+			this.Produce(client,"Coffee");
 			this.Refill(client,"Crema_Beans");
 			this.Refill(client,"Espresso_Beans");
 		}	
@@ -300,36 +306,38 @@ export class Ascii extends Room {
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
 	}
-
-	onRefill(client: Client, data: any) {
-		if (data == "all") {
-			this.fillResources();
-			return;
-		}
-		if (!max.has(data)) {
-			return;
-		}
-		this.state.Resources[data] = max.get(data);
+	
+	pause() {
+		clearInterval(this.gametimer);
+		this.onMessage("move", (client, message) => {});
+		this.onMessage("use", (client, message) => {});
+		this.state.paused = true;
 	}
-
-
-	onCreate (options: any) {
-		this.setState(new State());
-		this.fillResources();
-		//link Message Handlers
+	
+	resume() {
+		this.gametimer = setInterval(() => {this.gametick()}, 1000);
 		this.onMessage("move", (client, message) => {
 			this.onMove(client, message)
 		});
 		this.onMessage("use", (client, message) => {
 			this.onUse(client, message)
 		});
-		this.onMessage("refill", (client, message) => {
-			this.onRefill(client, message)
+		this.state.paused = false;
+	}
+	
+	onPause(client : Client, data : any) {
+		if (client.sessionId != this.tutor) { return; }
+		if (this.state.paused) { this.resume(); }
+		else { this.pause(); }
+	}
+	
+	onCreate (options: any) {
+		this.setState(new State());
+		this.fillResources();
+		//link Message Handlers
+		this.onMessage("pause", (client, message) => {
+			this.onPause(client, message)
 		});
-		//start game timer, number is intervall in milliseconds
-		setInterval(() => {
-			this.gametick()
-		}, 1500);
 
 		this.customerMaxId = 0;
 	}
@@ -337,6 +345,10 @@ export class Ascii extends Room {
 	onJoin(client: Client, options: any) {
 		client.send("id", client.sessionId);
 		this.state.createPlayer(client.sessionId);
+		if (this.tutor == "") {
+			this.tutor = client.sessionId;
+			this.state.players[client.sessionId].y = -4;
+		}
 	}
 
 	onLeave(client: Client, consented: boolean) {
@@ -345,14 +357,14 @@ export class Ascii extends Room {
 
 	onDispose() {
 	}
-
+	
 	generateCustomer() {
 		if (this.state.customers.length >= 7) {
 			return;
 		}
 		var random: number = Math.floor(Math.random() * 20); // numbers between 0 and 10
 		if (random >= 13) {
-			var order_items: string[] = ["Kolle", "Zotrine", "Premium", "Empty_Coffee_Cup", "Kolle_Pfand", "Zotrine_Pfand", "Premium_Pfand"]
+			var order_items: string[] = ["Kolle", "Zotrine", "Premium", "Empty_Coffee_Cup", "Kolle_Pfand", "Zotrine_Pfand", "Premium_Pfand","Cappucchino","Coffee"]
 			var order_item: string = ''
 			var i: number;
 			let wants = new MapSchema<number>();

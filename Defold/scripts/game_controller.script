@@ -170,6 +170,8 @@ function on_message(self, message_id, message, sender)
 		room:send("move",message.dir);
 	elseif (message_id == hash("use")) then
 		room:send("use")
+	elseif (message_id == hash("pause")) then
+		room:send("pause")
 	end
 	
 end
