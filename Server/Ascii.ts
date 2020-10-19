@@ -352,7 +352,7 @@ export class Ascii extends Room {
 		}
 		var random: number = Math.floor(Math.random() * 20); // numbers between 0 and 10
 		if (random >= 13) {
-			var order_items: string[] = ["Kolle", "Zotrine", "Premium", "Empty_Coffee_Cup", "Kolle_Pfand", "Zotrine_Pfand", "Premium_Pfand"]
+			var order_items: string[] = ["Kolle", "Zotrine", "Premium", "Empty_Coffee_Cup", "Kolle_Pfand", "Zotrine_Pfand", "Premium_Pfand", "Coffee", "Cappucchino"]
 			var order_item: string = ''
 			var i: number;
 			let wants = new MapSchema<number>();
