@@ -55,7 +55,7 @@ export class Ascii extends Room {
 	gametick() {
 		this.generateCustomer();
 		this.state.time--;
-		if (state.time == 0) {
+		if (this.state.time == 0) {
 			this.pause();
 		}
 	}
