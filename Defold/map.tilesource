@@ -70,9 +70,63 @@ animations {
   flip_vertical: 0
 }
 animations {
-  id: "Empty"
+  id: "Customer_3"
+  start_tile: 29
+  end_tile: 29
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Customer_4"
+  start_tile: 39
+  end_tile: 39
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Customer_5"
   start_tile: 49
   end_tile: 49
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Customer_6"
+  start_tile: 59
+  end_tile: 59
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Customer_7"
+  start_tile: 69
+  end_tile: 69
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Customer_8"
+  start_tile: 79
+  end_tile: 79
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "Empty"
+  start_tile: 36
+  end_tile: 36
   playback: PLAYBACK_LOOP_FORWARD
   fps: 1
   flip_horizontal: 0
