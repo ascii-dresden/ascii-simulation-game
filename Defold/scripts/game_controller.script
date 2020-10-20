@@ -108,6 +108,10 @@ function Move(change)
 end
 
 function onStateChange(change)
+	
+	msg.post("default:/machine#machine", "Game State", {coffee = room.state.Resources['Crema_Beans'], espresso= room.state.Resources['Espresso_Beans'], milk= room.state.Resources['Milk']});
+	
+	
 	Move(change)
 	for k, v in pairs(change) do
 		if v['field'] == 'customers' then
