@@ -190,7 +190,7 @@ export class Ascii extends Room {
 	Machine(client: Client, side : string) {
 		console.log(side);
 		//both Produce and Refill methods check if the player has the valid inventory state
-		if (side == "milk") {
+		if (side == "Cappucchino") {
 			this.Produce(client,"Cappucchino");
 			this.Refill(client,"Milk");
 		}
