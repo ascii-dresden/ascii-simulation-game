@@ -29,7 +29,7 @@ class Customer extends Schema {
 		super();
 		this.wants = wants;
 		this.id = id;
-		this.sprite_id = Math.floor(Math.random() * 1.99) + 1; // numbers between 1 and 2
+		this.sprite_id = Math.floor(Math.random() * 7.99) + 1; // numbers between 1 and 2
 
 	}
 }
