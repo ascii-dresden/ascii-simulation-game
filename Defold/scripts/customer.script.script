@@ -46,20 +46,20 @@ function on_message(self, message_id, message, sender)
 	if message.sprite_id then
 		sprite.play_flipbook("#sprite",hash("Customer_".. message.sprite_id))
 	end
+	
 
 	if message.order and self.order then
-		update_item_text(self.items,message.order)
+		update_item_text(self.items,message.order.items)
 	end
 	if message.order and not self.order then
 		--delete_items(self.items)
-		for k, v in pairs(message.order) do
-			if k ~= '__keys' then
-				add_item(self, k, v)	
-			end
+		local order = message.order.items
+		for k,v in pairs(order) do
+			add_item(self, k, v)	
 		end
 		self.item_count = 1
 		add_item(self, "Money", 0)
-	end
+	end	
 	if message.y then
 		local position = go.get_position();
 		position.y = message.y;

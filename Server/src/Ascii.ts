@@ -29,7 +29,7 @@ class Customer extends Schema {
 		super();
 		this.wants = wants;
 		this.id = id;
-		this.sprite_id = Math.floor(Math.random() * 7.99) + 1; // numbers between 1 and 2
+		this.sprite_id = Math.floor(Math.random() * 7.99) + 1;
 
 	}
 }
@@ -312,6 +312,7 @@ export class Ascii extends Room {
 		this.onMessage("move", (client, message) => {});
 		this.onMessage("use", (client, message) => {});
 		this.state.paused = true;
+		console.log(this.state.customers)
 	}
 	
 	resume() {
@@ -359,29 +360,31 @@ export class Ascii extends Room {
 	}
 	
 	generateCustomer() {
+		//only 7 customers fit at the counter
 		if (this.state.customers.length >= 7) {
 			return;
 		}
-		var random: number = Math.floor(Math.random() * 20); // numbers between 0 and 10
+		//customers spawn randomly, function is called once per second
+		var random: number = Math.floor(Math.random() * 20); // numbers between 0 and 20
 		if (random >= 13) {
 			var order_items: string[] = ["Kolle", "Zotrine", "Premium", "Empty_Coffee_Cup", "Kolle_Pfand", "Zotrine_Pfand", "Premium_Pfand","Cappucchino","Coffee"]
 			var order_item: string = ''
 			var i: number;
-			let wants = new MapSchema<number>();
+			let wants = new MapSchema<number>();  //total ammount of items including duplicates
 			var amount: number = Math.floor(Math.random() * 3) + 1; // numbers between 1 and 4
 			for (i = 1; i <= amount; i++) {
 
-				var random: number = Math.floor(Math.random() * order_items.length); // numbers between 0 and 3
+				// random orderable item
+				var random: number = Math.floor(Math.random() * order_items.length); 
 				order_item = order_items[random]
 
 				if (wants[order_item]) {
-					wants[order_item] = wants[order_item] + 1;
+					wants.set(order_item,wants.get(order_item) + 1);
 				} else {
-					wants[order_item] = 1
+					wants.set(order_item,1)
 				}
 			}
 			this.customerMaxId = this.customerMaxId +1;
-
 			this.state.createCustomer(wants, this.customerMaxId)
 		}
 	}

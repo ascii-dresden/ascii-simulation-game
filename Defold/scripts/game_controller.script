@@ -19,7 +19,7 @@ function setContains(set, key)
 end
 
 function gamestateHasCustomer(id)
-	for k,v in pairs(room.state.customers) do
+	for k,v in pairs(room.state.customers.items) do
 		if v.id == id then
 			return true
 		end
@@ -29,10 +29,8 @@ end
 
 function drawCustomers(change)
 	--update and add customers from gamestate
-	print(room.state.customers.keys)
-	for pos in pairs(room.state.customers.keys) do
-		customer = room.state.customers[pos]
-		-- called out of order
+	for pos,customer in pairs(room.state.customers.items) do
+		-- called out of order	
 		if not setContains(customers, customer.id) then
 			-- create new customer if not yet created
 			created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,0.1), vmath.quat(),{},3.125)
@@ -46,6 +44,7 @@ function drawCustomers(change)
 		--lua starts indexing at 1 instead of 0 like everything else
 		newy = (pos-1) * scaling + spriteCenter;
 		customer_go = customers[customer.id]
+		
 		msg.post(customer_go, "Game State", {y = newy, order = customer.wants})
 	end
 
@@ -87,7 +86,7 @@ function Move(change)
 		newinv = room.state.players[id].inventory
 		msg.post("default:/player#player", "Game State", {x = newx, y = newy, rot = newrot, inventory = newinv, color= room.state.players[id].sprite});
 
-		for other_id,value in pairs(room.state.players) do
+		for other_id,value in pairs(room.state.players.items) do
 			if other_id ~= id and room.state.players[other_id].x and not other_players[other_id] then 
 				newx = room.state.players[other_id].x*scaling + spriteCenter;
 				newy = room.state.players[other_id].y*scaling + spriteCenter;
