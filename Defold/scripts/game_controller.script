@@ -29,10 +29,9 @@ end
 
 function drawCustomers(change)
 	--update and add customers from gamestate
-
-
-	for pos, customer in pairs(room.state.customers) do
-
+	print(room.state.customers.keys)
+	for pos in pairs(room.state.customers.keys) do
+		customer = room.state.customers[pos]
 		-- called out of order
 		if not setContains(customers, customer.id) then
 			-- create new customer if not yet created
@@ -141,7 +140,7 @@ function init(self)
 end
 
 function update(self, dt)
-	client:loop()
+	--client:loop()
 end
 
 function join(room_id)

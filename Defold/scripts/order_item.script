@@ -3,7 +3,9 @@ function on_message(self, message_id, message, sender)
 	-- Add message-handling code here
 	-- Learn more: https://defold.com/manuals/message-passing/
 	-- Remove this function if not needed
-	if message.item then	
+	print(sender)
+	print(message)
+		if message.item then	
 		--sprite.play_flipbook("#sprite",hash(message.item))
 	end
 	if message.amount then
