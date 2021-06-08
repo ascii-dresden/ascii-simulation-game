@@ -123,6 +123,7 @@ export class Ascii extends Room {
 
 	//item (desire) gets send out to the customer, assumes customer wants the item
 	CustomerReceive(pos: number, desire : string) {
+		console.log("customer received " + desire)
 		let customer = this.state.customers[pos];
 		this.state.customers[pos].wants[desire]--;
 		if (customer.wants[desire] == 0) {
@@ -149,12 +150,16 @@ export class Ascii extends Room {
 			return;
 		}
 		let inv = this.state.players[client.sessionId].inventory;
+		console.log(inv)
+		console.log(pos)
+		console.log(this.state.customers[pos].wants)
+		console.log(this.state.customers[pos].id)
 		if (inv == "PHP_Cup") { 
 			this.CustomerAngry(pos);
 			this.state.players[client.sessionId].inventory = "Empty";
 			return;
 		}
-		for (let desire of (Object.keys(this.state.customers[pos].wants))) {
+		for (let desire of this.state.customers[pos].wants.keys()) {
 			//returning empty stuff
 			if (desire.startsWith("Empty") || desire.endsWith("_Pfand") || desire == "Money") {
 				if (this.state.players[client.sessionId].inventory != "Empty") {
@@ -188,7 +193,6 @@ export class Ascii extends Room {
 	
 	//this can be either getting coffee, or refilling, and handles both sides of the machine
 	Machine(client: Client, side : string) {
-		console.log(side);
 		//both Produce and Refill methods check if the player has the valid inventory state
 		if (side == "Cappucchino") {
 			this.Produce(client,"Cappucchino");
@@ -312,7 +316,6 @@ export class Ascii extends Room {
 		this.onMessage("move", (client, message) => {});
 		this.onMessage("use", (client, message) => {});
 		this.state.paused = true;
-		console.log(this.state.customers)
 	}
 	
 	resume() {
@@ -348,7 +351,8 @@ export class Ascii extends Room {
 		this.state.createPlayer(client.sessionId);
 		if (this.tutor == "") {
 			this.tutor = client.sessionId;
-			this.state.players[client.sessionId].y = -4;
+			//makes tutor invisible
+			//this.state.players[client.sessionId].y = -4;
 		}
 	}
 
