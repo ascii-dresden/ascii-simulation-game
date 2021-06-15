@@ -14,6 +14,7 @@ local spriteCenter = 50;
 local other_players = {}
 local customers = {}
 
+local counter = 0;
 function setContains(set, key)
 	return set[key] ~= nil
 end
@@ -29,8 +30,11 @@ end
 
 function drawCustomers(change)
 	--update and add customers from gamestate
-	for pos,customer in pairs(room.state.customers.items) do
-		-- called out of order	
+	--the each function has parameters (value,key)
+	for customer in room.state.customers.items do
+	--room.state.customers:each(function(customer,pos)
+		pos = 1
+		-- called out of order
 		if not setContains(customers, customer.id) then
 			-- create new customer if not yet created
 			created_id = factory.create("default:/customer_factory#factory", vmath.vector3(50,0,0.1), vmath.quat(),{},3.125)
@@ -44,7 +48,8 @@ function drawCustomers(change)
 		--lua starts indexing at 1 instead of 0 like everything else
 		newy = (pos-1) * scaling + spriteCenter;
 		customer_go = customers[customer.id]
-		
+		counter = counter + 1;
+		print(counter,pos)
 		msg.post(customer_go, "Game State", {y = newy, order = customer.wants})
 	end
 

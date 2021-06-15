@@ -123,13 +123,12 @@ export class Ascii extends Room {
 
 	//item (desire) gets send out to the customer, assumes customer wants the item
 	CustomerReceive(pos: number, desire : string) {
-		console.log("customer received " + desire)
 		let customer = this.state.customers[pos];
 		this.state.customers[pos].wants[desire]--;
 		if (customer.wants[desire] == 0) {
 			delete this.state.customers[pos].wants[desire];
 		}
-		if (Object.keys(customer.wants).length != 0) { return; }
+		if (customer.wants.size != 0) { return; }
 		if (customer.pays != 0) { 
 			this.state.customers[pos].wants["Money"] = 1;
 			return;
@@ -150,10 +149,6 @@ export class Ascii extends Room {
 			return;
 		}
 		let inv = this.state.players[client.sessionId].inventory;
-		console.log(inv)
-		console.log(pos)
-		console.log(this.state.customers[pos].wants)
-		console.log(this.state.customers[pos].id)
 		if (inv == "PHP_Cup") { 
 			this.CustomerAngry(pos);
 			this.state.players[client.sessionId].inventory = "Empty";
