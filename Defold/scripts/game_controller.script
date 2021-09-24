@@ -31,7 +31,6 @@ end
 function drawCustomers(change)
 	--update and add customers from gamestate
 	--the each function has parameters (value,key)
-	print(room.state.customers["items"])
 	pos = 0
 	for _,customer in pairs(room.state.customers["items"]) do
 		pos++
@@ -48,10 +47,8 @@ function drawCustomers(change)
 		--update all customer
 		--lua starts indexing at 1 instead of 0 like everything else
 		newy = (pos-1) * scaling + spriteCenter;
-		print(newy)
 		customer_go = customers[customer.id]
 		counter = counter + 1;
-		print(counter,pos)
 		msg.post(customer_go, "Game State", {y = newy, order = customer.wants})
 	end
 
