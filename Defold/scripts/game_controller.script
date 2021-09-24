@@ -33,7 +33,7 @@ function drawCustomers(change)
 	--the each function has parameters (value,key)
 	pos = 0
 	for _,customer in pairs(room.state.customers["items"]) do
-		pos++
+		pos = pos + 1
 		-- called out of order
 		if not setContains(customers, customer.id) then
 			-- create new customer if not yet created
