@@ -304,6 +304,7 @@ export class Ascii extends Room {
 		//actually moving the player
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
+		console.log(this.state.customers)
 	}
 	
 	pause() {
@@ -347,7 +348,7 @@ export class Ascii extends Room {
 		if (this.tutor == "") {
 			this.tutor = client.sessionId;
 			//makes tutor invisible
-			//this.state.players[client.sessionId].y = -4;
+			this.state.players[client.sessionId].y = -4;
 		}
 	}
 
