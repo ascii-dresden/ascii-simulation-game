@@ -75,7 +75,7 @@ end
 
 function menu(mode)
 	-- mode enable or disable
-	local menu_objects = {'cappucchino', 'coffee', 'customers', 'cashier', 'sink', 'trash', 'kolle', 'premium', 'zotrine', 'empty', 'refill', 'controls', 'bg'}
+	local menu_objects = {'cappucchino', 'coffee', 'customers', 'cashier', 'sink', 'trash', 'kolle', 'premium', 'zotrine', 'empty', 'refill', 'controls', 'bg', 'group', 'groupname'}
 	for k,v in pairs(menu_objects) do
 		msg.post("#" .. v, mode) --visible = false
 	end
