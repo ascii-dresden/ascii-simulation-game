@@ -224,12 +224,12 @@ export class Ascii extends Room {
 	HandItem(client : Client, x : number, y : number) {
 		if (this.state.players[client.sessionId].inventory == "Empty") { return; }
 		let otherPlayer = "";
-		for (let player of Object.keys(this.state.players)) {
-			if ((this.state.players[player].x == x) && (this.state.players[player].y == y)) {
-				otherPlayer = player;
-				break;
+		this.state.players.forEach((player,id) => {
+			if ((player.x == x) && (player.y == y)) {
+				otherPlayer = id;
+				return;
 			}
-		}
+		});
 		if (otherPlayer == "") { return; }
 		if (this.state.players[otherPlayer].inventory != "Empty") { return; }
 		this.state.players[otherPlayer].inventory = this.state.players[client.sessionId].inventory;
@@ -279,11 +279,12 @@ export class Ascii extends Room {
 		
 	//checks collision with any player
 	playerCollision(x:number, y:number) {
-		for (let id of Object.keys(this.state.players)){
-			if (this.state.players[id].x == x &&
-				this.state.players[id].y == y) { return true; }
-		}	
-		return false;
+	   let output = false;
+	   this.state.players.forEach((player,id) => {
+			if (player.x == x &&
+				player.y == y) { output = true; }
+		});	
+		return output;
 	}
 	
 	//move messages say the client tried to walk 1 space to given direction
@@ -304,7 +305,6 @@ export class Ascii extends Room {
 		//actually moving the player
 		this.state.players[client.sessionId].x = x;
 		this.state.players[client.sessionId].y = y;
-		console.log(this.state.customers)
 	}
 	
 	pause() {
