@@ -18,11 +18,8 @@ const gameServer = new Server({
   server,
 });
 
-// register your room handlers
-gameServer.define('Ascii1', Ascii);
-gameServer.define('Ascii2', Ascii);
-gameServer.define('Ascii3', Ascii);
-
+//register your room handlers
+gameServer.define('Ascii', Ascii).filterBy(['GroupName']);
 
 /**
  * Register @colyseus/social routes
