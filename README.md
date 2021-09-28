@@ -12,12 +12,13 @@ npm start
 ``` 
 
 - run client using:
-cd Defold
-open game.project in defold
-- Project->Fetch Libraries
 
-Controlls:
-Arrow Keys - move
-E - use, give, produce, ... 
-<Tab> - Menü
-<1,2,3> - Join room 1, 2 or 3 while in menu
+  - `cd Defold`
+  - open game.project in Defold
+  - Project->Fetch Libraries
+
+Controls:
+- `Arrow Keys` - move
+- `E` - use, give, produce, ... 
+- `Tab` - Menü
+- `G` - enter room name while in menu
