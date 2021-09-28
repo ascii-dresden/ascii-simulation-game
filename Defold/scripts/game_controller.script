@@ -31,9 +31,13 @@ end
 function drawCustomers(change)
 	--update and add customers from gamestate
 	--the each function has parameters (value,key)
-	pos = 0
-	for _,customer in pairs(room.state.customers["items"]) do
-		pos = pos + 1
+	identifier = {}
+	for i,_ in pairs(room.state.customers["items"]) do
+		table.insert(identifier, i)
+	end
+	table.sort(identifier)
+	for pos,n in ipairs(identifier) do
+		customer = room.state.customers["items"][n]
 		-- called out of order
 		if not setContains(customers, customer.id) then
 			-- create new customer if not yet created
