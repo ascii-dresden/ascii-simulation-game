@@ -152,20 +152,6 @@ end
 
 function join(room_id)
 	if room_id ~= nil then
-		client:get_available_rooms("Ascii", function(err, rooms)
-			if (err) then
-				console.error(err);
-				return
-			end
-
-			for i, room in pairs(rooms) do
-				print(room.roomId)
-				print(room.clients)
-				print(room.maxClients)
-				print(room.metadata)
-				print(room.options)
-			end
-		end);
 		client:join_or_create("Ascii", {GroupName = room_id}, function(err, room_instance)
 		if err then
 			print("ERROR JOINING ROOM")

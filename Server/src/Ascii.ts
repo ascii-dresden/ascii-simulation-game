@@ -42,7 +42,7 @@ class State extends Schema {
 	@type("number") time = 300;
 	@type("boolean") paused = true;
 	//function to create a new player for given id
-	createPlayer (id: string) { this.players[ id ] = new Player(Object.keys(this.players).length); }
+	createPlayer (id: string) { this.players[ id ] = new Player(this.players.size); }
 	@type([Customer]) customers = new ArraySchema<Customer>();
 	createCustomer (wants: MapSchema<number>, id: number) { this.customers.push(new Customer(wants, id)); }
 }
